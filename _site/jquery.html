@@ -176,7 +176,7 @@
 <hr />
 <p>常用方法</p>
 
-<p>//查找指定选择器下所有的input，select 并遍历每一个</p>
+<h2 id="查找指定选择器下所有的inputselect-并遍历每一个">//查找指定选择器下所有的input，select 并遍历每一个</h2>
 
 <p>$(opts.form).find(“input,select”).each(function(){
         		if($.trim($(this).val())!=””){
@@ -187,28 +187,42 @@
         		opts.param[$(this).attr(“name”)]=$(this).val();
         	});</p>
 
-<p>$(“.class”).append(&lt;div&gt;&lt;div&gt;);//追加子节点</p>
+<h2 id="追加子节点">//追加子节点</h2>
+<p>$(“.class”).append(&lt;div&gt;&lt;div&gt;);</p>
 
-<p>$(“.class”).ready(function(){…});//规定当dom完全加载时（页面）要执行的函数</p>
+<h2 id="规定当dom完全加载时页面要执行的函数">//规定当dom完全加载时（页面）要执行的函数</h2>
 
-<p>//回车键出发搜索按钮
-    $(“body”).keydown(function(){
-    	if(event.keyCode==”13”){
-    		$(“.query”).click();
-    	}
-    	});</p>
+<p>$(“.class”).ready(function(){…});</p>
 
-<p>$(“.class”).remove();//删除当前元素与其子元素</p>
+<h2 id="回车键出发搜索按钮">//回车键出发搜索按钮</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>$("body").keydown(function(){
+	if(event.keyCode=="13"){
+		$(".query").click();
+	}
+	});
+</code></pre>
+</div>
 
-<p>$(“.class”).empty();//删除子元素</p>
+<h2 id="删除当前元素与其子元素">//删除当前元素与其子元素</h2>
+<p>$(“.class”).remove();</p>
 
-<p>$(“body”).on(“click”,”.newadd1”,function(){}//后绑定事件</p>
+<h2 id="删除子元素">//删除子元素</h2>
+<p>$(“.class”).empty();</p>
 
-<p>JSON.stringify({onceCode:single})//将对象转为json字符串格式</p>
+<h2 id="后绑定事件">//后绑定事件</h2>
 
-<p>var data=JSON.parse(mess);//解析对象转为字符串格式</p>
+<p>$(“body”).on(“click”,”.newadd1”,function(){}</p>
 
-<p>var single=localStorage.getItem(“single”);//全局变量中取值 对应的是setItem</p>
+<h2 id="将对象转为json字符串格式">//将对象转为json字符串格式</h2>
+
+<p>JSON.stringify({onceCode:single})</p>
+
+<h2 id="解析对象转为字符串格式">//解析对象转为字符串格式</h2>
+<p>var data=JSON.parse(mess);</p>
+
+<h2 id="全局变量中取值-对应的是setitem">//全局变量中取值 对应的是setItem</h2>
+
+<p>var single=localStorage.getItem(“single”);</p>
 
 
     </div>
