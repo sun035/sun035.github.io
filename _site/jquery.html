@@ -24,9 +24,9 @@
             <a class="home-follow" href="#" title="Contact Me">+</a>
         </div>
         <div class="home-contact">
-            <a href="https://github.com/Mukosame/" target="_blank" style="margin-left:-5px;"><img src="https://github.com/favicon.ico" alt="" width="22"/></a>
-           <!-- <a href="http://www.douban.com/people/23026489/" target="_blank" style="text-align:center;"><img src="http://www.douban.com/favicon.ico" alt="" width="22"/></a>
-            <a href="http://www.zhihu.com/people/xiang-xiao-yu-20" target="_blank" style="text-align:right"><img src="http://www.zhihu.com/favicon.ico" alt="" width="22"/></a>-->
+          
+           <!-- <a href="http://www.douban.com/people/23026489/" target="_blank" style="text-align:center;"><img src="http://www.douban.com/favicon.ico" alt="" width="22"/></a>-->
+            <a href="http://http://wiki.jikexueyuan.com/list/java/" target="_blank" style="text-align:right"><img src="http://wiki.jikexueyuan.com/assets/favicon.ico" alt="" width="22"/></a>
         </div>
     </div>
 
@@ -173,6 +173,43 @@
 </code></pre>
 </div>
 
+<hr />
+<p>常用方法</p>
+
+<p>//查找指定选择器下所有的input，select 并遍历每一个</p>
+
+<p>$(opts.form).find(“input,select”).each(function(){
+        		if($.trim($(this).val())!=””){
+					//$(this).attr(“name”),取name值
+        			opts.param[$(this).attr(“name”)]=$(this).val();
+        		}
+				//$(this).val(); 获取val
+        		opts.param[$(this).attr(“name”)]=$(this).val();
+        	});</p>
+
+<p>$(“.class”).append(&lt;div&gt;&lt;div&gt;);//追加子节点</p>
+
+<p>$(“.class”).ready(function(){…});//规定当dom完全加载时（页面）要执行的函数</p>
+
+<p>//回车键出发搜索按钮
+    $(“body”).keydown(function(){
+    	if(event.keyCode==”13”){
+    		$(“.query”).click();
+    	}
+    	});</p>
+
+<p>$(“.class”).remove();//删除当前元素与其子元素</p>
+
+<p>$(“.class”).empty();//删除子元素</p>
+
+<p>$(“body”).on(“click”,”.newadd1”,function(){}//后绑定事件</p>
+
+<p>JSON.stringify({onceCode:single})//将对象转为json字符串格式</p>
+
+<p>var data=JSON.parse(mess);//解析对象转为字符串格式</p>
+
+<p>var single=localStorage.getItem(“single”);//全局变量中取值 对应的是setItem</p>
+
 
     </div>
 
@@ -181,6 +218,8 @@
         <ul class="artical-list">
         
             <li><a href="/jquery">jquery extend,data方法</a></li>
+        
+            <li><a href="/java-nio">java nio内容</a></li>
         
             <li><a href="/java-jndi">java jndi</a></li>
         
