@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--
+    * Author:         BeiYuu
+    * Revised:        Mukosame
+    -->
+    <meta charset="utf-8" />
+    <title>java 动态代理 | wt'blog</title>
+    <meta name="author" content="Mukosame" />
+    <meta name="renderer" content="webkit">
+    <meta name="description" content="Everything about Mukosame" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/css/default.css" type="text/css" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="alternate" type="application/atom+xml" title="Recent Entries" href="/atom.xml" />
+    <script src="/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+</head>
+<body>
+
+    <div class="home-menu">
+        <div class="home-icon-con">
+            <a class="home-menu-icon" href="/">Mukosame</a>
+            <a class="home-follow" href="#" title="Contact Me">+</a>
+        </div>
+        <div class="home-contact">
+          
+           <!-- <a href="http://www.douban.com/people/23026489/" target="_blank" style="text-align:center;"><img src="http://www.douban.com/favicon.ico" alt="" width="22"/></a>-->
+            <a href="http://http://wiki.jikexueyuan.com/list/java/" target="_blank" style="text-align:right"><img src="http://wiki.jikexueyuan.com/assets/favicon.ico" alt="" width="22"/></a>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/js/prettify/prettify.css" />
+<style type="text/css">
+    body { background:#e8e8e8; }
+    @media screen and (max-width: 750px){
+        body { background:#fff; }
+    }
+    @media screen and (max-width: 1020px){
+        body { background:#fff; }
+    }
+</style>
+
+<div id="content">
+    <div class="entry">
+        <h1 class="entry-title"><a href="/java-aop" title="java 动态代理">java 动态代理</a></h1>
+        <p class="entry-date">2017-09-13</p>
+        <p>动态代理可以让我们在调用方法之前或之后进行一些操作，这部分的内容实现了与业务内容解耦,其好处多多..</p>
+
+<p>基于jdk需要依赖接口,代理类会在内存中生成，通过反射等技术实现方法调用，下面是一个简单的动态代理实现</p>
+
+<h2 id="首先指定接口">首先指定接口</h2>
+
+<p>public interface Subject {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public void doSomething();
+</code></pre>
+</div>
+
+<p>}</p>
+
+<h2 id="实现接口的业务类负责我们的业务逻辑">实现接口的业务类，负责我们的业务逻辑</h2>
+
+<p>public class RealSubject implements Subject {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@Override
+public void doSomething() {
+	System.out.println("------");
+
+}
+</code></pre>
+</div>
+
+<p>}</p>
+
+<h2 id="必须实现invocationhandler-最终代理类将实现此类进行调用例如代理类中superproxyhandlerinvoke">必须实现InvocationHandler ,最终代理类将实现此类进行调用（例如：代理类中（super.ProxyHandler.invoke(…)））</h2>
+
+<p>public class ProxyHandler implements InvocationHandler {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> private Object proxied;
+ 
+ public ProxyHandler(Object proxied){
+	 this.proxied=proxied;
+ };
+@Override
+public Object invoke(Object proxy, Method method, Object[] args)
+		throws Throwable {
+	System.out.println("java动态代理!!!!!!");
+	return method.invoke(proxied, args);
+}
+</code></pre>
+</div>
+
+<h2 id="进行测试">进行测试</h2>
+
+<p>public class ProxyTest {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static void main(String[] args) {
+
+	RealSubject real=new RealSubject();
+
+	Subject pro=(Subject) Proxy. 
+
+		newProxyInstance(
+					
+		Subject.class.getClassLoader(),
+					
+		new Class[]{Subject.class},
+					
+		new ProxyHandler(real));
+	
+	pro.doSomething();
+	
+	
+}
+</code></pre>
+</div>
+
+<p>}</p>
+
+<h2 id="可以看到我们使用起来还是挺方便的下面我们进入proxy看看是如何实现的">可以看到我们使用起来还是挺方便的，下面我们进入Proxy看看是如何实现的</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@CallerSensitive
+public static Object newProxyInstance(ClassLoader loader,
+                                      Class&lt;?&gt;[] interfaces,
+                                      InvocationHandler h)
+    throws IllegalArgumentException
+{
+    Class&lt;?&gt; cl = getProxyClass0(loader, interfaces);
+    try {
+        final Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);//constructorParams==class[]{InvocationHandler.class}
+        final InvocationHandler ih = h;
+        if (sm != null &amp;&amp; ProxyAccessHelper.needsNewInstanceCheck(cl)) {
+            return AccessController.doPrivileged(new PrivilegedAction&lt;Object&gt;() {
+                public Object run() {
+                    return newInstance(cons, ih);
+                }
+            });
+        } else {
+            return newInstance(cons, ih);
+        }
+    } catch (NoSuchMethodException e) {
+        throw new InternalError(e.toString());
+    }
+}
+</code></pre>
+</div>
+
+<p>去除其他方法这里只看</p>
+
+<p>Class&lt;?&gt; cl = getProxyClass0(loader, interfaces); 进入方法中</p>
+
+<p>private static Class<?> getProxyClass0(ClassLoader loader,
+                                           Class<?>… interfaces) {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    if (interfaces.length &gt; 65535) {//接口数量不能超过65535..
+        throw new IllegalArgumentException("interface limit exceeded");
+    }
+
+    Class&lt;?&gt; proxyClass = null;
+
+    /* collect interface names to use as key for proxy class cache */
+    String[] interfaceNames = new String[interfaces.length];
+
+    // for detecting duplicates
+    Set&lt;Class&lt;?&gt;&gt; interfaceSet = new HashSet&lt;&gt;();
+
+    for (int i = 0; i &lt; interfaces.length; i++) {
+       
+        String interfaceName = interfaces[i].getName();
+        Class&lt;?&gt; interfaceClass = null;
+        try {
+            interfaceClass = Class.forName(interfaceName, false, loader);
+			//第二个参数表示是否初始化 检查接口是否可见
+        } catch (ClassNotFoundException e) {
+        }
+        if (interfaceClass != interfaces[i]) {//根据名称和类加载器进行检查class
+            throw new IllegalArgumentException(
+                interfaces[i] + " is not visible from class loader");
+        }
+        if (!interfaceClass.isInterface()) {//如果不是一个接口抛出异常
+            throw new IllegalArgumentException(
+                interfaceClass.getName() + " is not an interface");
+        }
+
+        /*
+         * Verify that this interface is not a duplicate.
+         */
+        if (interfaceSet.contains(interfaceClass)) {//集合中包含重复的class
+            throw new IllegalArgumentException(
+                "repeated interface: " + interfaceClass.getName());
+        }
+        interfaceSet.add(interfaceClass);
+
+        interfaceNames[i] = interfaceName;
+    }
+
+   
+    List&lt;String&gt; key = Arrays.asList(interfaceNames);
+
+    /*
+     * Find or create the proxy class cache for the class loader.
+     */
+    Map&lt;List&lt;String&gt;, Object&gt; cache;
+    synchronized (loaderToCache) {//loaderToCache是一个弱引用map集合
+        cache = loaderToCache.get(loader);
+        if (cache == null) {
+            cache = new HashMap&lt;&gt;();
+            loaderToCache.put(loader, cache);//进行缓存
+        }
+     
+    }
+
+   
+    synchronized (cache) {
+     
+        do {
+            Object value = cache.get(key);
+            if (value instanceof Reference) {
+                proxyClass = (Class&lt;?&gt;) ((Reference) value).get();
+            }
+            if (proxyClass != null) {
+                // proxy class already generated: return it
+                return proxyClass;
+            } else if (value == pendingGenerationMarker) {
+                // proxy class being generated: wait for it
+                try {
+                    cache.wait();
+		//pendingGenerationMarker是一个标记，
+		//用于标记一个动态代理类正在被创建中
+		//..注意这是一个同步块
+                } catch (InterruptedException e) {
+                }
+                continue;
+            } else {
+               
+                cache.put(key, pendingGenerationMarker);
+		//key为字符串集合
+                break;
+            }
+        } while (true);
+    }
+
+    try {
+        String proxyPkg = null;     // package to define proxy class in
+
+       
+        for (int i = 0; i &lt; interfaces.length; i++) {
+            int flags = interfaces[i].getModifiers();
+            if (!Modifier.isPublic(flags)) {
+                String name = interfaces[i].getName();
+                int n = name.lastIndexOf('.');
+                String pkg = ((n == -1) ? "" : name.substring(0, n + 1));
+                if (proxyPkg == null) {
+                    proxyPkg = pkg;
+                } else if (!pkg.equals(proxyPkg)) {
+                    throw new IllegalArgumentException(
+                        "non-public interfaces from different packages");
+                }
+            }
+        }
+
+        if (proxyPkg == null) {
+            // if no non-public proxy interfaces,
+			//use com.sun.proxy package
+            proxyPkg = ReflectUtil.PROXY_PACKAGE + ".";
+        }
+
+        {
+           
+            long num;
+            synchronized (nextUniqueNumberLock) {
+                num = nextUniqueNumber++;
+            }
+            String proxyName = proxyPkg + proxyClassNamePrefix + num;
+      // 动态地生成代理类的字节码数组     
+            byte[] proxyClassFile = ProxyGenerator.generateProxyClass(
+                proxyName, interfaces);
+				//在具体的方法就不开源的。。
+            try {
+	// 动态地定义新生成的代理类		
+                proxyClass = defineClass0(loader, proxyName,
+                    proxyClassFile, 0, proxyClassFile.length);
+            } catch (ClassFormatError e) {
+              
+                throw new IllegalArgumentException(e.toString());
+            }
+        }
+        // add to set of all generated proxy classes, for isProxyClass
+        proxyClasses.put(proxyClass, null);
+
+    } finally {
+       
+        synchronized (cache) {	
+            if (proxyClass != null) {
+                cache.put(key, new WeakReference&lt;Class&lt;?&gt;&gt;(proxyClass));
+            } else {
+                cache.remove(key);
+            }
+            cache.notifyAll();
+	//释放其他线程进行操作	
+        }
+    }
+    return proxyClass;
+}
+</code></pre>
+</div>
+
+<p>然后根据其他方法反射创建出代理类</p>
+
+<p>我们可以import sun.misc.ProxyGenerator，调用 generateProxyClass方法产生binary data，</p>
+
+<p>然后写入文件，最后通过反编译工具来查看内部实现原理。 反编译后的ProxySubject.java Proxy静态方法newProxyInstance</p>
+
+<h2 id="参考">参考</h2>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>
+
+<span class="kn">import</span> <span class="nn">java.lang.reflect.*</span><span class="o">;</span>   
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">ProxySubject</span> <span class="kd">extends</span> <span class="n">Proxy</span>   
+    <span class="kd">implements</span> <span class="n">Subject</span>   
+<span class="o">{</span>   
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Method</span> <span class="n">m1</span><span class="o">;</span>   
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Method</span> <span class="n">m0</span><span class="o">;</span>   
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Method</span> <span class="n">m3</span><span class="o">;</span>   
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Method</span> <span class="n">m2</span><span class="o">;</span>   
+    <span class="kd">public</span> <span class="nf">ProxySubject</span><span class="o">(</span><span class="n">InvocationHandler</span> <span class="n">invocationhandler</span><span class="o">)</span>   
+    <span class="o">{</span>   
+        <span class="kd">super</span><span class="o">(</span><span class="n">invocationhandler</span><span class="o">);</span>   
+    <span class="o">}</span>   
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">)</span>   
+    <span class="o">{</span>   
+        <span class="k">try</span>  
+        <span class="o">{</span>   
+            <span class="k">return</span> <span class="o">((</span><span class="n">Boolean</span><span class="o">)</span><span class="kd">super</span><span class="o">.</span><span class="na">h</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">m1</span><span class="o">,</span> <span class="k">new</span> <span class="n">Object</span><span class="o">[]</span> <span class="o">{</span>   
+                <span class="n">obj</span>   
+            <span class="o">})).</span><span class="na">booleanValue</span><span class="o">();</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Error</span> <span class="n">_ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">UndeclaredThrowableException</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>   
+        <span class="o">}</span>   
+    <span class="o">}</span>   
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span>   
+    <span class="o">{</span>   
+        <span class="k">try</span>  
+        <span class="o">{</span>   
+            <span class="k">return</span> <span class="o">((</span><span class="n">Integer</span><span class="o">)</span><span class="kd">super</span><span class="o">.</span><span class="na">h</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">m0</span><span class="o">,</span> <span class="kc">null</span><span class="o">)).</span><span class="na">intValue</span><span class="o">();</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Error</span> <span class="n">_ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">UndeclaredThrowableException</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>   
+        <span class="o">}</span>   
+    <span class="o">}</span>   
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span>   
+    <span class="o">{</span>   
+        <span class="k">try</span>  
+        <span class="o">{</span>   
+            <span class="kd">super</span><span class="o">.</span><span class="na">h</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">m3</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>   
+            <span class="k">return</span><span class="o">;</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Error</span> <span class="n">_ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">UndeclaredThrowableException</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>   
+        <span class="o">}</span>   
+    <span class="o">}</span>   
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span>   
+    <span class="o">{</span>   
+        <span class="k">try</span>  
+        <span class="o">{</span>   
+            <span class="k">return</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="kd">super</span><span class="o">.</span><span class="na">h</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">m2</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Error</span> <span class="n">_ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">UndeclaredThrowableException</span><span class="o">(</span><span class="n">throwable</span><span class="o">);</span>   
+        <span class="o">}</span>   
+    <span class="o">}</span>   
+    <span class="kd">static</span>    
+    <span class="o">{</span>   
+        <span class="k">try</span>  
+        <span class="o">{</span>   
+            <span class="n">m1</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"java.lang.Object"</span><span class="o">).</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"equals"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Class</span><span class="o">[]</span> <span class="o">{</span>   
+                <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"java.lang.Object"</span><span class="o">)</span>   
+            <span class="o">});</span>   
+            <span class="n">m0</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"java.lang.Object"</span><span class="o">).</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"hashCode"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Class</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>   
+            <span class="n">m3</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"Subject"</span><span class="o">).</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"doSomething"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Class</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>   
+            <span class="n">m2</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"java.lang.Object"</span><span class="o">).</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"toString"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Class</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">NoSuchMethodException</span> <span class="n">nosuchmethodexception</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NoSuchMethodError</span><span class="o">(</span><span class="n">nosuchmethodexception</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>   
+        <span class="o">}</span>   
+        <span class="k">catch</span><span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">classnotfoundexception</span><span class="o">)</span>   
+        <span class="o">{</span>   
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">NoClassDefFoundError</span><span class="o">(</span><span class="n">classnotfoundexception</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>   
+        <span class="o">}</span>   
+    <span class="o">}</span>   
+<span class="o">}</span>  
+
+</code></pre>
+</div>
+
+<p>好吧。。写的惨不忍睹 好在没人看不用去祸害别人哈哈</p>
+
+
+    </div>
+
+    <div class="sidenav">
+        <h2>Blog</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/java-spring-ioc">spring ioc 双向引用</a></li>
+        
+            <li><a href="/java-aop">java 动态代理</a></li>
+        
+            <li><a href="/java-final">java final</a></li>
+        
+            <li><a href="/jquery">jquery extend,data方法</a></li>
+        
+            <li><a href="/java-jndi">java jndi</a></li>
+        
+            <li><a href="/git-order">git常用命令</a></li>
+        
+            <li><a href="/myfirstblog">只言</a></li>
+        
+        </ul>
+
+        <h2>Dump</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/test">不语</a></li>
+        
+        </ul>
+
+        <h2>Project</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/pro">匠心</a></li>
+        
+        </ul>
+    </div>
+</div>
+
+<script src="/js/post.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        $(function(){
+            $('.home-follow').click(function(e){
+                e.preventDefault();
+
+                if($('.home-contact').is(':visible')){
+                    $('.home-contact').slideUp(100);
+                }else{
+                    $('.home-contact').slideDown(100);
+                }
+            });
+        })
+    </script>
+</body>
+</html>

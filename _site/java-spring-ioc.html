@@ -6,7 +6,7 @@
     * Revised:        Mukosame
     -->
     <meta charset="utf-8" />
-    <title>匠心 | wt'blog</title>
+    <title>spring ioc 双向引用 | wt'blog</title>
     <meta name="author" content="Mukosame" />
     <meta name="renderer" content="webkit">
     <meta name="description" content="Everything about Mukosame" />
@@ -43,10 +43,57 @@
 
 <div id="content">
     <div class="entry">
-        <h1 class="entry-title"><a href="/pro" title="匠心">匠心</a></h1>
-        <p class="entry-date">2017-09-06</p>
-        <h1 id="匠心"><a href="/pro  (匠心)">匠心</a></h1>
-<p>2015-12-12 By <a href="http://sun035.github.io/">Mukosame</a></p>
+        <h1 class="entry-title"><a href="/java-spring-ioc" title="spring ioc 双向引用">spring ioc 双向引用</a></h1>
+        <p class="entry-date">2017-09-13</p>
+        <p>public abstract class AbstractBeanFactory implements BeanFactory {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@Override
+public Object getBean(String name) throws Exception {
+	BeanDefinition beanDefinition = beanDefinitionMap.get(name);
+	if (beanDefinition == null) {
+		throw new IllegalArgumentException("No bean named " + name + " is defined");
+	}
+	Object bean = beanDefinition.getBean();
+	if (bean == null) {
+		bean = doCreateBean(beanDefinition);
+	}
+	return bean;
+}
+}
+</code></pre>
+</div>
+
+<p>public class AutowireCapableBeanFactory extends AbstractBeanFactory {</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@Override
+protected Object doCreateBean(BeanDefinition beanDefinition) throws Exception {
+	Object bean = createBeanInstance(beanDefinition);
+    beanDefinition.setBean(bean);
+	applyPropertyValues(bean, beanDefinition);
+	return bean;
+}
+
+protected Object createBeanInstance(BeanDefinition beanDefinition) throws Exception {
+	return beanDefinition.getBeanClass().newInstance();
+}
+
+protected void applyPropertyValues(Object bean, BeanDefinition mbd) throws Exception {
+	for (PropertyValue propertyValue : mbd.getPropertyValues().getPropertyValues()) {
+		Field declaredField = bean.getClass().getDeclaredField(propertyValue.getName());
+		declaredField.setAccessible(true);
+		Object value = propertyValue.getValue();
+		if (value instanceof BeanReference) {
+			BeanReference beanReference = (BeanReference) value;
+			value = getBean(beanReference.getName());
+		}
+		declaredField.set(bean, value);
+	}
+} }
+</code></pre>
+</div>
+
+<p>为了解决循环依赖的问题，我们使用lazy-init的方式，将createBean的事情放到<code class="highlighter-rouge">getBean</code>的时候才执行，这样在注入bean的时候，
+如果该属性对应的bean找不到，那么就先创建！因为总是先创建后注入，所以不会存在两个循环依赖的bean创建死锁的问题。</p>
 
 
     </div>
