@@ -408,6 +408,30 @@ public static Object newProxyInstance(ClassLoader loader,
 
 <p>好吧。。写的惨不忍睹 好在没人看不用去祸害别人哈哈</p>
 
+<h2 id="总结">总结</h2>
+
+<p>一个典型的动态代理创建对象过程可分为以下四个步骤：</p>
+
+<p>1、通过实现InvocationHandler接口创建自己的调用处理器 IvocationHandler handler = new InvocationHandlerImpl(…);</p>
+
+<p>2、通过为Proxy类指定ClassLoader对象和一组interface创建动态代理类</p>
+
+<p>Class clazz = Proxy.getProxyClass(classLoader,new Class[]{…});</p>
+
+<p>3、通过反射机制获取动态代理类的构造函数，其参数类型是调用处理器接口类型</p>
+
+<p>Constructor constructor = clazz.getConstructor(new Class[]{InvocationHandler.class});</p>
+
+<p>4、通过构造函数创建代理类实例，此时需将调用处理器对象作为参数被传入</p>
+
+<p>Interface Proxy = (Interface)constructor.newInstance(new Object[] (handler));</p>
+
+<p>为了简化对象创建过程，Proxy类中的newInstance方法封装了2~4，只需两步即可完成代理对象的创建。</p>
+
+<p>生成的ProxySubject继承Proxy类实现Subject接口，实现的Subject的方法实际调用处理器的invoke方法，</p>
+
+<p>而invoke方法利用反射调用的是被代理对象的的方法（Object result=method.invoke(proxied,args)）</p>
+
 
     </div>
 
