@@ -71,7 +71,7 @@ public class Test {
 
 
 二、分析生成代理类代码
-
+---
 
 
 
@@ -132,8 +132,8 @@ public class Target$$EnhancerByCGLIB$$788444a0 extends Target implements Factory
 ``` 
 
 
-分析代码
-
+回调方法
+---
 
 
 ``` java ```
@@ -293,7 +293,7 @@ private static class FastClassInfo
 
 
 关于这个有一个案例：
-
+----
 
 
 
