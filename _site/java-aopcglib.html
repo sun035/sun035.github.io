@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--
+    * Author:         BeiYuu
+    * Revised:        Mukosame
+    -->
+    <meta charset="utf-8" />
+    <title>java 动态代理 cglib | wt'blog</title>
+    <meta name="author" content="Mukosame" />
+    <meta name="renderer" content="webkit">
+    <meta name="description" content="Everything about Mukosame" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/css/default.css" type="text/css" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="alternate" type="application/atom+xml" title="Recent Entries" href="/atom.xml" />
+    <script src="/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+</head>
+<body>
+
+    <div class="home-menu">
+        <div class="home-icon-con">
+            <a class="home-menu-icon" href="/">Mukosame</a>
+            <a class="home-follow" href="#" title="Contact Me">+</a>
+        </div>
+        <div class="home-contact">
+          
+           <!-- <a href="http://www.douban.com/people/23026489/" target="_blank" style="text-align:center;"><img src="http://www.douban.com/favicon.ico" alt="" width="22"/></a>-->
+            <a href="http://http://wiki.jikexueyuan.com/list/java/" target="_blank" style="text-align:right"><img src="http://wiki.jikexueyuan.com/assets/favicon.ico" alt="" width="22"/></a>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/js/prettify/prettify.css" />
+<style type="text/css">
+    body { background:#e8e8e8; }
+    @media screen and (max-width: 750px){
+        body { background:#fff; }
+    }
+    @media screen and (max-width: 1020px){
+        body { background:#fff; }
+    }
+</style>
+
+<div id="content">
+    <div class="entry">
+        <h1 class="entry-title"><a href="/java-aopcglib" title="java 动态代理 cglib">java 动态代理 cglib</a></h1>
+        <p class="entry-date">2017-09-14</p>
+        <p><img src="https://raw.githubusercontent.com/sun035/images/master/class.png" alt="class简介" /></p>
+
+<p>基于jdk实现的动态代理主要是依赖于实现业务类所需要的接口，并继承proxy类，最终通过handler
+转发反射调用方法，在内存中生成的代理类是final的。</p>
+
+<p>没想到cglib的实现比jdk更复杂些….通过网络慢慢学习先初步理解大概</p>
+
+<h2 id="一cglib-动态代理示例">一、cglib 动态代理示例</h2>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code> <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Target</span><span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Target f()"</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Target g()"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Interceptor</span> <span class="kd">implements</span> <span class="n">MethodInterceptor</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">intercept</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="n">Method</span> <span class="n">method</span><span class="o">,</span><span class="n">Object</span><span class="o">[]</span> <span class="n">args</span><span class="o">,</span><span class="n">MethodProxy</span> <span class="n">proxy</span><span class="o">)</span>
+	<span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"I am intercept begin"</span><span class="o">);</span>
+	<span class="c1">//Note: 此处一定要使用proxy的invokeSuper方法来调用目标类的方法</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="na">invokeSuper</span><span class="o">(</span><span class="n">obj</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"I am intercept end"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">DebuggingClassWriter</span><span class="o">.</span><span class="na">DEBUG_LOCATION_PROPERTY</span><span class="o">,</span> <span class="s">"F:\\code"</span><span class="o">);</span>
+         <span class="c1">//实例化一个增强器，也就是cglib中的一个class generator</span>
+        <span class="n">Enhancer</span> <span class="n">eh</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Enhancer</span><span class="o">();</span>
+         <span class="c1">//设置目标类</span>
+        <span class="n">eh</span><span class="o">.</span><span class="na">setSuperclass</span><span class="o">(</span><span class="n">Target</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="c1">// 设置拦截对象</span>
+        <span class="n">eh</span><span class="o">.</span><span class="na">setCallback</span><span class="o">(</span><span class="k">new</span> <span class="n">Interceptor</span><span class="o">());</span>
+        <span class="c1">// 生成代理类并返回一个实例</span>
+        <span class="n">Target</span> <span class="n">t</span> <span class="o">=</span> <span class="o">(</span><span class="n">Target</span><span class="o">)</span> <span class="n">eh</span><span class="o">.</span><span class="na">create</span><span class="o">();</span>
+        <span class="n">t</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
+        <span class="n">t</span><span class="o">.</span><span class="na">g</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+
+</code></pre>
+</div>
+<p>通过cglib无需实现代理类
+1.首先实例化一个字节码增强器
+2.设置目标类
+3.设置拦截对象
+4.生成代理类并返</p>
+
+<p>二、分析生成代理类代码</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Target</span><span class="err">$</span><span class="n">$EnhancerByCGLIB</span><span class="err">$$</span><span class="mi">788444</span><span class="n">a0</span> <span class="kd">extends</span> <span class="n">Target</span> <span class="kd">implements</span> <span class="n">Factory</span>
+<span class="o">{</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">CGLIB$BOUND</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span> <span class="n">CGLIB$THREAD_CALLBACKS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Callback</span><span class="o">[]</span> <span class="n">CGLIB$STATIC_CALLBACKS</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">MethodInterceptor</span> <span class="n">CGLIB$CALLBACK_0</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Method</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Method</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MethodProxy</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Proxy</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">CGLIB$emptyArgs</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Method</span> <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Method</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">MethodProxy</span> <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Proxy</span><span class="o">;</span>
+    
+    <span class="kd">static</span> <span class="kt">void</span> <span class="n">CGLIB$STATICHOOK1</span><span class="o">()</span>
+    <span class="o">{</span>
+      <span class="n">CGLIB$THREAD_CALLBACKS</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">();</span>
+      <span class="n">CGLIB$emptyArgs</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+      <span class="n">Class</span> <span class="n">localClass1</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"net.sf.cglib.test.Target$$EnhancerByCGLIB$$788444a0"</span><span class="o">);</span>
+      <span class="n">Class</span> <span class="n">localClass2</span><span class="o">;</span>
+      <span class="n">Method</span><span class="o">[]</span> <span class="n">tmp60_57</span> <span class="o">=</span> <span class="n">ReflectUtils</span><span class="o">.</span><span class="na">findMethods</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span> <span class="s">"g"</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"f"</span><span class="o">,</span> <span class="s">"()V"</span> <span class="o">},</span> <span class="o">(</span><span class="n">localClass2</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"net.sf.cglib.test.Target"</span><span class="o">)).</span><span class="na">getDeclaredMethods</span><span class="o">());</span>
+      <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Method</span> <span class="o">=</span> <span class="n">tmp60_57</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+      <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Proxy</span> <span class="o">=</span> <span class="n">MethodProxy</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">localClass2</span><span class="o">,</span> <span class="n">localClass1</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"g"</span><span class="o">,</span> <span class="s">"CGLIB$g$0"</span><span class="o">);</span>
+      <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Method</span> <span class="o">=</span> <span class="n">tmp60_57</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+      <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Proxy</span> <span class="o">=</span> <span class="n">MethodProxy</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">localClass2</span><span class="o">,</span> <span class="n">localClass1</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"f"</span><span class="o">,</span> <span class="s">"CGLIB$f$1"</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">final</span> <span class="kt">void</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="o">()</span>
+    <span class="o">{</span>
+      <span class="kd">super</span><span class="o">.</span><span class="na">g</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">()</span>
+    <span class="o">{</span>
+      <span class="n">MethodInterceptor</span> <span class="n">tmp4_1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">tmp4_1</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+      <span class="o">{</span>
+          <span class="n">CGLIB$BIND_CALLBACKS</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+          <span class="n">tmp4_1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">tmp4_1</span><span class="o">.</span><span class="na">intercept</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Method</span><span class="o">,</span> <span class="n">CGLIB$emptyArgs</span><span class="o">,</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Proxy</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">else</span><span class="o">{</span>
+          <span class="kd">super</span><span class="o">.</span><span class="na">g</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+
+</code></pre>
+</div>
+
+<p>分析代码</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>   <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">()</span>
+    <span class="o">{</span>
+      <span class="n">MethodInterceptor</span> <span class="n">tmp4_1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">tmp4_1</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+      <span class="o">{</span>
+          <span class="n">CGLIB$BIND_CALLBACKS</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+          <span class="n">tmp4_1</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">tmp4_1</span><span class="o">.</span><span class="na">intercept</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Method</span><span class="o">,</span> <span class="n">CGLIB$emptyArgs</span><span class="o">,</span> <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Proxy</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">else</span><span class="o">{</span>
+          <span class="kd">super</span><span class="o">.</span><span class="na">g</span><span class="o">();</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+
+</code></pre>
+</div>
+
+<p>首先判断是否实现了拦截对象 没有的话则去 CGLIB$BIND_CALLBACKS(this);查找是否存在</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">void</span> <span class="n">CGLIB$BIND_CALLBACKS</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">){</span>
+        <span class="n">Target</span><span class="err">$</span><span class="n">$EnhancerByCGLIB</span><span class="err">$$</span><span class="mi">788444</span><span class="n">a0</span> <span class="n">temp_1</span> <span class="o">=</span> <span class="o">(</span><span class="n">Target</span><span class="err">$</span><span class="n">$EnhancerByCGLIB</span><span class="err">$$</span><span class="mi">788444</span><span class="n">a0</span><span class="o">)</span><span class="n">o</span><span class="o">;</span>
+        <span class="n">Object</span> <span class="n">temp_2</span><span class="o">;</span>
+        <span class="n">Callback</span><span class="o">[]</span> <span class="n">temp_3</span>
+        <span class="nf">if</span><span class="o">(</span><span class="n">temp_1</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$BOUND</span> <span class="o">==</span> <span class="kc">true</span><span class="o">){</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">temp_1</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$BOUND</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="n">temp_2</span> <span class="o">=</span> <span class="n">CGLIB$THREAD_CALLBACKS</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">temp_2</span><span class="o">!=</span><span class="kc">null</span><span class="o">){</span>
+            <span class="n">temp_3</span> <span class="o">=</span> <span class="o">(</span><span class="n">Callback</span><span class="o">[])</span><span class="n">temp_2</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">CGLIB$STATIC_CALLBACKS</span><span class="o">!=</span><span class="kc">null</span><span class="o">){</span>
+            <span class="n">temp_3</span> <span class="o">=</span> <span class="n">CGLIB$STATIC_CALLBACKS</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">else</span><span class="o">{</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">temp_1</span><span class="o">.</span><span class="na">CGLIB</span><span class="n">$CALLBACK_0</span> <span class="o">=</span> <span class="o">(</span><span class="n">MethodInterceptor</span><span class="o">)</span><span class="n">temp_3</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+        <span class="k">return</span><span class="err">；</span>
+    <span class="o">}</span>
+
+</code></pre>
+</div>
+<p>CGLIB$BIND_CALLBACKS 先从CGLIB$THREAD_CALLBACKS中get拦截对象，</p>
+
+<p>如果获取不到的话，再从CGLIB$STATIC_CALLBACKS来获取，如果也没有则认为该方法不需要代理。</p>
+
+<p>那么拦截对象是如何设置到CGLIB$THREAD_CALLBACKS</p>
+
+<p>网上解答：</p>
+
+<p>Enhancer：firstInstance</p>
+
+<p>Enhancer：createUsingReflection</p>
+
+<p>Enhancer：setThreadCallbacks</p>
+
+<p>Enhancer：setCallbacksHelper</p>
+
+<p>Target<script type="math/tex">EnhancerByCGLIB</script>788444a0 ： CGLIB$SET_THREAD_CALLBACKS</p>
+
+<p>在第5步，调用了代理类的CGLIB$SET_THREAD_CALLBACKS来完成拦截对象的注入。</p>
+
+<p>接下来有意思的是</p>
+
+<p>tmp4_1.intercept(this, CGLIB$g$0$Method, CGLIB$emptyArgs, CGLIB$g$0$Proxy);</p>
+
+<p>不过在这之前先看看第二个参数和第四个参数是的创建，与上边对应的是</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>  <span class="n">Method</span><span class="o">[]</span> <span class="n">tmp60_57</span> <span class="o">=</span> <span class="n">ReflectUtils</span><span class="o">.</span><span class="na">findMethods</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[]</span> <span class="o">{</span> <span class="s">"g"</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"f"</span><span class="o">,</span> <span class="s">"()V"</span> <span class="o">},</span> <span class="o">(</span><span class="n">localClass2</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"net.sf.cglib.test.Target"</span><span class="o">)).</span><span class="na">getDeclaredMethods</span><span class="o">());</span>
+  <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Method</span> <span class="o">=</span> <span class="n">tmp60_57</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+  <span class="n">CGLIB$g</span><span class="err">$</span><span class="mi">0</span><span class="n">$Proxy</span> <span class="o">=</span> <span class="n">MethodProxy</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">localClass2</span><span class="o">,</span> <span class="n">localClass1</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"g"</span><span class="o">,</span> <span class="s">"CGLIB$g$0"</span><span class="o">);</span>
+  <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Method</span> <span class="o">=</span> <span class="n">tmp60_57</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+  <span class="n">CGLIB$f</span><span class="err">$</span><span class="mi">1</span><span class="n">$Proxy</span> <span class="o">=</span> <span class="n">MethodProxy</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">localClass2</span><span class="o">,</span> <span class="n">localClass1</span><span class="o">,</span> <span class="s">"()V"</span><span class="o">,</span> <span class="s">"f"</span><span class="o">,</span> <span class="s">"CGLIB$f$1"</span><span class="o">);</span>
+  
+  
+</code></pre>
+</div>
+
+<p>ReflectUtils.findMethods的功能类似于校验，最终返回的是代理之前原对象的方法</p>
+
+<p>MethodProxy.create(localClass2, localClass1, “()V”, “g”, “CGLIB$g$0”);是对</p>
+
+<p>代理方法的初始化，这里有一点，在jdk中是通过反射的方式调用方法，而cglib不同的</p>
+
+<p>是它创建了对原对象方法的索引，通过索引的方式调用以提高效率，看代码：</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">MethodProxy</span> <span class="nf">create</span><span class="o">(</span><span class="n">Class</span> <span class="n">c1</span><span class="o">,</span> <span class="n">Class</span> <span class="n">c2</span><span class="o">,</span> <span class="n">String</span> <span class="n">desc</span><span class="o">,</span> <span class="n">String</span> <span class="n">name1</span><span class="o">,</span> <span class="n">String</span> <span class="n">name2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MethodProxy</span> <span class="n">proxy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MethodProxy</span><span class="o">();</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="na">sig1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Signature</span><span class="o">(</span><span class="n">name1</span><span class="o">,</span> <span class="n">desc</span><span class="o">);</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="na">sig2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Signature</span><span class="o">(</span><span class="n">name2</span><span class="o">,</span> <span class="n">desc</span><span class="o">);</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="na">createInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CreateInfo</span><span class="o">(</span><span class="n">c1</span><span class="o">,</span> <span class="n">c2</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">proxy</span><span class="o">;</span>
+    <span class="o">}</span>
+	
+	
+	
+<span class="kd">public</span> <span class="n">Object</span> <span class="nf">invokeSuper</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">init</span><span class="o">();</span>
+            <span class="n">FastClassInfo</span> <span class="n">fci</span> <span class="o">=</span> <span class="n">fastClassInfo</span><span class="o">;</span>
+            <span class="k">return</span> <span class="n">fci</span><span class="o">.</span><span class="na">f2</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">fci</span><span class="o">.</span><span class="na">i2</span><span class="o">,</span> <span class="n">obj</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InvocationTargetException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="n">e</span><span class="o">.</span><span class="na">getTargetException</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>	
+	
+	
+	
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">FastClassInfo</span>
+    <span class="o">{</span>
+        <span class="n">FastClass</span> <span class="n">f1</span><span class="o">;</span>
+        <span class="n">FastClass</span> <span class="n">f2</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">i1</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">i2</span><span class="o">;</span>
+    <span class="o">}</span>
+  
+	
+	
+
+</code></pre>
+</div>
+
+<p>在生成代理类对象的时候执行静态块的代码初始化参数的对象</p>
+
+<p>在回调方法的时候调用invokeSuper，会进行初始化FastClassInfo（第一次）</p>
+
+<p>关于这个有一个案例：</p>
+
+<p><code class="highlighter-rouge">java</code></p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">test10</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+        <span class="n">Test</span> <span class="n">tt</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Test</span><span class="o">();</span>
+        <span class="n">Test2</span> <span class="n">fc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Test2</span><span class="o">();</span>
+        <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">fc</span><span class="o">.</span><span class="na">getIndex</span><span class="o">(</span><span class="s">"f()V"</span><span class="o">);</span>
+        <span class="n">fc</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">index</span><span class="o">,</span> <span class="n">tt</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Test</span><span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">f</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"f method"</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">g</span><span class="o">(){</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"g method"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="kd">class</span> <span class="nc">Test2</span><span class="o">{</span>
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="kt">int</span> <span class="n">index</span><span class="o">,</span> <span class="n">Object</span> <span class="n">o</span><span class="o">,</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">ol</span><span class="o">){</span>
+        <span class="n">Test</span> <span class="n">t</span> <span class="o">=</span> <span class="o">(</span><span class="n">Test</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+        <span class="k">switch</span><span class="o">(</span><span class="n">index</span><span class="o">){</span>
+        <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="na">f</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="na">g</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getIndex</span><span class="o">(</span><span class="n">String</span> <span class="n">signature</span><span class="o">){</span>
+        <span class="k">switch</span><span class="o">(</span><span class="n">signature</span><span class="o">.</span><span class="na">hashCode</span><span class="o">()){</span>
+        <span class="k">case</span> <span class="mi">3078479</span><span class="o">:</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="k">case</span> <span class="mi">3108270</span><span class="o">:</span>
+            <span class="k">return</span> <span class="mi">2</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>	
+	
+
+</code></pre>
+</div>
+
+<p>上例中，Test2是Test的Fastclass，在Test2中有两个方法getIndex和invoke。</p>
+
+<p>在getIndex方法中对Test的每个方法建立索引，并根据入参（方法名+方法的描述符）</p>
+
+<p>来返回相应的索引。Invoke根据指定的索引，以ol为入参调用对象O的方法。</p>
+
+<p>这样就避免了反射调用，提高了效率。</p>
+
+<p>具体在创建实例当中我发现每一个方法都会构建对象….不知道这个对象是创建的单个方法还是整个类</p>
+
+
+    </div>
+
+    <div class="sidenav">
+        <h2>Blog</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/java-aopcglib">java 动态代理 cglib</a></li>
+        
+            <li><a href="/java-aop">java 动态代理</a></li>
+        
+            <li><a href="/java-final">java final</a></li>
+        
+            <li><a href="/java-spring-ioc">spring ioc 双向引用</a></li>
+        
+            <li><a href="/jquery">jquery extend,data方法</a></li>
+        
+            <li><a href="/java-jndi">java jndi</a></li>
+        
+            <li><a href="/git-order">git常用命令</a></li>
+        
+            <li><a href="/myfirstblog">只言</a></li>
+        
+        </ul>
+
+        <h2>Dump</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/test">不语</a></li>
+        
+        </ul>
+
+        <h2>Project</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/pro">匠心</a></li>
+        
+        </ul>
+    </div>
+</div>
+
+<script src="/js/post.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        $(function(){
+            $('.home-follow').click(function(e){
+                e.preventDefault();
+
+                if($('.home-contact').is(':visible')){
+                    $('.home-contact').slideUp(100);
+                }else{
+                    $('.home-contact').slideDown(100);
+                }
+            });
+        })
+    </script>
+</body>
+</html>
