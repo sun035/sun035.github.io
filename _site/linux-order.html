@@ -6,7 +6,7 @@
     * Revised:        Mukosame
     -->
     <meta charset="utf-8" />
-    <title>不语 | wt'blog</title>
+    <title>linux 命令 | wt'blog</title>
     <meta name="author" content="Mukosame" />
     <meta name="renderer" content="webkit">
     <meta name="description" content="Everything about Mukosame" />
@@ -43,36 +43,119 @@
 
 <div id="content">
     <div class="entry">
-        <h1 class="entry-title"><a href="/test" title="不语">不语</a></h1>
-        <p class="entry-date">2017-09-06</p>
-        <p>#测试</p>
+        <h1 class="entry-title"><a href="/linux-order" title="linux 命令">linux 命令</a></h1>
+        <p class="entry-date">2017-09-17</p>
+        <h2 id="查看-运行-进程">查看 运行 进程</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>ps-elf|grep tomcat  //查看进程
 
-<p>blog</p>
+kill -9 进程号    //杀掉进程
 
-<p>blog</p>
+tomcat ：
 
-<p>blog</p>
+cd 到 tomcat bin目录 ./startup.sh  //启动
 
-<p>blog</p>
+cd 到 logs tail-f catalina.out      //监控日志 
+</code></pre>
+</div>
 
-<p>blog</p>
+<h2 id="打包-解压文件">打包 解压文件</h2>
 
-<p>blog</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>zip：
 
-<p>blog</p>
+打包 ：zip something.zip something （目录请加 -r 参数）
 
-<p>blog</p>
+例如：zip -r something.zip /home/test   //将指定的目录打包
 
-<p>blog
-blog</p>
+解包：unzip something
 
-<p>blog</p>
+指定路径：-d 参数
 
-<p>blog</p>
+例如：unzip  something.zip -d /home/test   //解压
 
-<p>blog</p>
 
-<p>blog</p>
+
+tar：
+
+打包：tar -zcvf something.tar something
+
+解包：tar -zxvf something.tar   -c test
+
+指定路径：-C 参数
+</code></pre>
+</div>
+
+<h2 id="cp命令">cp命令</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cp [options] &lt;source file or directory&gt; &lt;target file or directory&gt;
+
+或
+cp [options] source1 source2 source3 …. directory
+</code></pre>
+</div>
+
+<p>上面第一条命令为单个文件或目录拷贝，下一个为多个文件拷贝到最后的目录。</p>
+
+<p>options选项包括：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>- a 保留链接和文件属性，递归拷贝目录，相当于下面的d、p、r三个选项组合。
+
+- d 拷贝时保留链接。
+
+- f 删除已经存在目标文件而不提示。
+
+- i 覆盖目标文件前将给出确认提示，属交互式拷贝。
+
+- p 复制源文件内容后，还将把其修改时间和访问权限也复制到新文件中。
+
+- r 若源文件是一目录文件，此时cp将递归复制该目录下所有的子目录和文件。当然，目标文件必须为一个目录名。
+
+- l 不作拷贝，只是链接文件。
+
+- s 复制成符号连结文件 (symbolic link)，亦即『快捷方式』档案；
+
+- u 若 destination 比 source 旧才更新 destination。
+</code></pre>
+</div>
+
+<h2 id="cp命令使用范例">cp命令使用范例</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>1、将文档 file1复制成file2，复制后名称被改file2
+
+cp -i file1 file2
+
+或，
+
+cp file1 file2
+
+2、将文档 file1复制到dir1目录下，复制后名称仍未file1
+
+cp -i file1 dir1
+
+或，
+
+cp file1 dir1
+
+3、将目录dir1复制到dir2目录下，复制结果目录被改名为dir2
+
+cp -r dir1 dir2
+
+4、将目录dir1下所有文件包括文件夹，都复制到dir2目录下
+
+cp -r dir1/*.* dir2   
+
+5、将/opt/a/下的a目录复制到 /opt/b/目录下
+
+cp -r /opt/a/ /opt/b/ 
+
+常见错误：
+
+1、提示cp: omitting directory错误
+
+复制目录时，使用-r选项即可递归拷贝，如下：
+
+cp -r dir1 dir2
+</code></pre>
+</div>
 
 
     </div>
@@ -80,6 +163,8 @@ blog</p>
     <div class="sidenav">
         <h2>Blog</h2>
         <ul class="artical-list">
+        
+            <li><a href="/linux-order">linux 命令</a></li>
         
             <li><a href="/mysql-indexes">mysql indexes</a></li>
         
@@ -104,7 +189,7 @@ blog</p>
         <h2>Dump</h2>
         <ul class="artical-list">
         
-            <li><a href="/test">不语</a></li>
+            <li><a href="/arithmetic-start-one">算法学习</a></li>
         
         </ul>
 
