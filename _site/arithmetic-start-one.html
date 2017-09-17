@@ -6,7 +6,7 @@
     * Revised:        Mukosame
     -->
     <meta charset="utf-8" />
-    <title>算法学习 | wt'blog</title>
+    <title>算法 1.1.14题 | wt'blog</title>
     <meta name="author" content="Mukosame" />
     <meta name="renderer" content="webkit">
     <meta name="description" content="Everything about Mukosame" />
@@ -25,7 +25,7 @@
         </div>
         <div class="home-contact">
           
-           <!-- <a href="http://www.douban.com/people/23026489/" target="_blank" style="text-align:center;"><img src="http://www.douban.com/favicon.ico" alt="" width="22"/></a>-->
+            <a href="https://www.ibm.com/developerworks/cn/java/" target="_blank" style="text-align:center;"><img src="https://www.ibm.com/favicon.ico" alt="" width="22"/></a>
             <a href="http://http://wiki.jikexueyuan.com/list/java/" target="_blank" style="text-align:right"><img src="http://wiki.jikexueyuan.com/assets/favicon.ico" alt="" width="22"/></a>
         </div>
     </div>
@@ -43,11 +43,79 @@
 
 <div id="content">
     <div class="entry">
-        <h1 class="entry-title"><a href="/arithmetic-start-one" title="算法学习">算法学习</a></h1>
+        <h1 class="entry-title"><a href="/arithmetic-start-one" title="算法 1.1.14题">算法 1.1.14题</a></h1>
         <p class="entry-date">2017-09-16</p>
-        <p>开始填坑，强迫自己学习，我不想只是一个码农…</p>
+        <p>开始填坑，强迫自己学习，不想只是一个码农…</p>
 
 <p>今天开始学习算法最终写下来使自己更加记忆深刻</p>
+
+<h2 id="1114题">1.1.14题</h2>
+
+<p>编写一个静态方法 lg()，接受一个整型参数 N，
+返回不大于 log2N 的最大整数。不要使用 Math 库。
+需要用到高中数学对数函数…这里先复习一下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>如果a的x次方为n,记作a^x=n;
+
+那么x就叫做，以a为底，n的对数
+
+记作x=logan（这里a是下标）
+
+常用公式： logaa=1;
+		   loga1=0;
+		   lg100=以10为底即log10 100=2;//10的2次方等于100
+		   lg2*5=lg2+lg5=1;
+</code></pre>
+</div>
+
+<h2 id="例题">例题</h2>
+<p><img src="https://raw.githubusercontent.com/sun035/images/master/%E5%AF%B9%E6%95%B0%E5%87%BD%E6%95%B0.png" alt="对数函数" /></p>
+
+<h2 id="思路">思路</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>根据上边复习的内容可知，返回不大于 log2N 的最大整数，
+n是已知的，x=log2n ，2的x次方等于n 得出下面程序
+</code></pre>
+</div>
+
+<h2 id="解答">解答</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>private static int lg(int N) {  
+		int product = 1;  
+		int x = -1;  
+		while (product &lt;= N) //把等于的情况也纳入进来，从而避免了在如23&gt;5这种情况的自增导致输出结果为3的情况  
+		{  
+			product *= 2;  
+			x++;  
+		}  
+		return x;  
+	}  
+	  
+	public static void main(String args[]) {  
+		int N = 100;
+		System.out.print(lg(N));  
+	}
+</code></pre>
+</div>
+
+<h2 id="思考">思考</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>	哦天真是够水的 
+	
+	在写的过程中还是没有实现出来,大脑在写的时候总是没有思路而在看别人的答案
+    却一看就懂我觉得还是没有一个整体的概念，脑子里的东西太零碎无法整合出来，一方面
+    也是平常不善于总结也是不善于抽象化的思考将其转化为程序 
+
+	对此应该考虑一个方案,先找到一个条件作为自认为的中为入口，即像如上面的题一样，
+    2的x次方等于用户给定的值，可以直接得出结论吗？显然是不能的，则要进行假设，初始值
+    进行计算判断，当p=1时成立吗？p等于2时...,这个时候肯定是要对中间值进行存储,也要
+    对x进行计数...然后代入法测试是否成立...
+
+	好吧当然是知道答案的时候好像都明白，一本正经的胡说八道一同，但这也是对自己的
+    一个警示，也是为什么要动手写博客的一个原因
+
+	找方法解决如何独立思考....千万不要忘了 复盘！ 复盘！
+</code></pre>
+</div>
 
 
     </div>
@@ -62,7 +130,7 @@
         
             <li><a href="/java-aop-cglib">java 动态代理 cglib</a></li>
         
-            <li><a href="/java-aop">java 动态代理</a></li>
+            <li><a href="/java-aop">java 动态代理 jdk</a></li>
         
             <li><a href="/java-final">java final</a></li>
         
@@ -81,7 +149,7 @@
         <h2>Dump</h2>
         <ul class="artical-list">
         
-            <li><a href="/arithmetic-start-one">算法学习</a></li>
+            <li><a href="/arithmetic-start-one">算法 1.1.14题</a></li>
         
         </ul>
 
