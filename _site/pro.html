@@ -48,6 +48,24 @@
         <h1 id="匠心"><a href="/pro  (匠心)">匠心</a></h1>
 <p>2015-12-12 By <a href="http://sun035.github.io/">Mukosame</a></p>
 
+<hr />
+
+<h2 id="文件下载">文件下载</h2>
+<p><a href="http://blog.5ibc.net/p/47737.html">文件下载带进度条</a></p>
+
+<p>看了看别人写的读取进度条就放spring里边玩玩，结果发现controller死活访问不了，</p>
+
+<p>通过一番查找发现原因：</p>
+
+<p>ContextLoaderListener和DispatcherServlet都可以配置spring相关的XML</p>
+
+<p>我将<mvc:annotation-driven></mvc:annotation-driven>声明在了application上下文的配置中，</p>
+
+<p>从而导致mvc的context 中声明的<context:component-scan base-package="com"></context:component-scan> 不起作用</p>
+
+<p><a href="http://www.it610.com/article/5189105.htm">网上解答</a> 
+….</p>
+
 
     </div>
 
@@ -62,6 +80,8 @@
             <li><a href="/java-aop-cglib">java 动态代理 cglib</a></li>
         
             <li><a href="/java-aop">java 动态代理 jdk</a></li>
+        
+            <li><a href="/java-spring-transaction">spring 事务</a></li>
         
             <li><a href="/java-final">java final</a></li>
         
