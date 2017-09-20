@@ -129,6 +129,79 @@ aspectj方式的xml配置（常用）
 
 
 
+使用 aop给方法添加日志
+---
+
+
+
+	Spring配置文件中：
+
+	<!-- 注解 AOP配置 将LoggerBean.logController
+	作用到所有Controller组件的execute上-->
+	<context:component-scan 
+		base-package="com.wt.demo.aspect"/>
+		
+	<!-- 开启AOP注解标记的使用,例如@Aspect,@Before,@After -->
+	
+	
+	<aop:aspectj-autoproxy />
+
+	
+	
+	实体：
+	
+
+	package com.wt.demo.aspect;
+
+	import org.aspectj.lang.annotation.Aspect;
+	import org.aspectj.lang.annotation.Before;
+	import org.springframework.stereotype.Component;
+
+	@Component//扫描,等价于<bean>定义
+	@Aspect//等价于<aop:aspect>定义
+	public class LoggerBean {
+		/*
+		* @Before               -- 前置通知
+		* @AfterReturing        -- 后置通知
+		* @Around               -- 环绕通知（目标对象方法默认不执行的，需要手动执行）
+		* @After                -- 最终通知
+		* @AfterThrowing        -- 异常抛出通知
+		*/
+		//等价于<aop:before>定义
+		//在Controller方法执行前,先执行logController处理
+		@Before("within(com.wt.demo.controller..*)")
+		public void logController(){
+			System.out.println("进入Controller处理请求");
+		}
+		
+		}
+		
+		
+		
+		
+		
+		
+	被注入的controller:
+
+
+
+	@Controller
+	@RequestMapping("/test")
+	public class TestController {
+		@Resource
+		private TestService service;
+		
+		@RequestMapping("/tests")
+		@ResponseBody
+		public String execute(){			
+			return ervice.doSometing();
+		}
+		
+	}
+
+		
+	
+	
 
 
 

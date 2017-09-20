@@ -44,7 +44,7 @@
 <div id="content">
     <div class="entry">
         <h1 class="entry-title"><a href="/java-spring-transaction" title="spring 事务">spring 事务</a></h1>
-        <p class="entry-date">2017-09-12</p>
+        <p class="entry-date">2017-09-19</p>
         <p>1、理解Spring事务管理的基本概念</p>
 
 <p>2、掌握Spring事务管理的应用场景</p>
@@ -133,12 +133,87 @@ oracle read_committed
 
 <p><img src="https://raw.githubusercontent.com/sun035/images/master/%E9%85%8D%E7%BD%AE%E4%BA%8B%E5%8A%A1%E5%A2%9E%E5%BC%BA%E5%B1%9E%E6%80%A7%E4%BF%A1%E6%81%AF.png" alt="配置事务增强属性信息图" /></p>
 
+<h2 id="使用-aop给方法添加日志">使用 aop给方法添加日志</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Spring配置文件中：
+
+&lt;!-- 注解 AOP配置 将LoggerBean.logController
+作用到所有Controller组件的execute上--&gt;
+&lt;context:component-scan 
+	base-package="com.wt.demo.aspect"/&gt;
+	
+&lt;!-- 开启AOP注解标记的使用,例如@Aspect,@Before,@After --&gt;
+
+
+&lt;aop:aspectj-autoproxy /&gt;
+
+
+
+实体：
+
+
+package com.wt.demo.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Component//扫描,等价于&lt;bean&gt;定义
+@Aspect//等价于&lt;aop:aspect&gt;定义
+public class LoggerBean {
+	/*
+	* @Before               -- 前置通知
+	* @AfterReturing        -- 后置通知
+	* @Around               -- 环绕通知（目标对象方法默认不执行的，需要手动执行）
+	* @After                -- 最终通知
+	* @AfterThrowing        -- 异常抛出通知
+	*/
+	//等价于&lt;aop:before&gt;定义
+	//在Controller方法执行前,先执行logController处理
+	@Before("within(com.wt.demo.controller..*)")
+	public void logController(){
+		System.out.println("进入Controller处理请求");
+	}
+	
+	}
+	
+	
+	
+	
+	
+	
+被注入的controller:
+
+
+
+@Controller
+@RequestMapping("/test")
+public class TestController {
+	@Resource
+	private TestService service;
+	
+	@RequestMapping("/tests")
+	@ResponseBody
+	public String execute(){			
+		return ervice.doSometing();
+	}
+	
+}
+</code></pre>
+</div>
+
 
     </div>
 
     <div class="sidenav">
         <h2>Blog</h2>
         <ul class="artical-list">
+        
+            <li><a href="/javaee-start">什么才是java的基础知识？</a></li>
+        
+            <li><a href="/code-standard">代码规范学习</a></li>
+        
+            <li><a href="/java-spring-transaction">spring 事务</a></li>
         
             <li><a href="/linux-order">linux 命令</a></li>
         
@@ -147,8 +222,6 @@ oracle read_committed
             <li><a href="/java-aop-cglib">java 动态代理 cglib</a></li>
         
             <li><a href="/java-aop">java 动态代理 jdk</a></li>
-        
-            <li><a href="/java-spring-transaction">spring 事务</a></li>
         
             <li><a href="/java-final">java final</a></li>
         
