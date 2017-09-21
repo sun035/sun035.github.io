@@ -51,10 +51,13 @@ blog计划：
 		https://github.com/xwjie/PLMCodeTemplate
 		代码框架模板。追求工匠精神，编写简单代码。
 		
+		java ee基础  -->什么才是java的基础知识？
+		
+		spring 过滤器 拦截器 配置
 		
 		基于springboot的rest调用框架  https://github.com/xwjie/MyRestUtil
 		
-		java ee基础  -->什么才是java的基础知识？
+		
 
 		状态模式   http://www.importnew.com/26627.html
 		
@@ -64,7 +67,7 @@ blog计划：
 		
 		-spring 事务 spring aop
 		
-		过滤器 拦截器 反射 注解 等
+		反射 注解 等
 		
 		
 		
@@ -92,6 +95,7 @@ blog计划：
 		spring ioc	
 		
 		nginx  http://blog.5ibc.net/m/25
+		
 		Java对象内存布局   http://tinylcy.me/2016/11/30/Java%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/
 	    
 		  
