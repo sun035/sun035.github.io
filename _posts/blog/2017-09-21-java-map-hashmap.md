@@ -216,11 +216,18 @@ Test1、将5左移2位：
 hashMap学习
 ---
 
+
+
+![map类结构图](https://raw.githubusercontent.com/sun035/images/master/map%E7%B1%BB%E5%85%B3%E7%B3%BB%E5%9B%BE.png)		
+
+
+
+
 1.7以前hashmap的结构是链表的数组的形式
 
 java8后对hashmap进行优化，主要为扩容后的处理链表大于8后将转化为红黑树
 
-
+这里只考虑实现方式，关于红黑树等数据结构将在以后进行学习
 
 
 	/**
@@ -357,7 +364,107 @@ resize方法扩充HashMap的时候，不需要像JDK1.7的实现那样重新计�
 
 
 
+entrySet实现
+---
 
+
+在这之前说一下增强for循环，增强for循环的本质就是迭代器模式的实现，但我们不能再增强for循环中进行删除对象，在遍历的时候迭代器会创建一个原来对象数据的索引表
+这里删除对象中的元素索引表并不会改变 ，我们可以迭代器进行遍历使用它自身的remove，它在删除的时候也会维护索引
+
+
+
+
+
+jdk1.7实现
+
+
+	public Set<Map.Entry<K,V>> entrySet() {
+        return entrySet0();
+    }
+
+    private Set<Map.Entry<K,V>> entrySet0() {
+        Set<Map.Entry<K,V>> es = entrySet;
+        return es != null ? es : (entrySet = new EntrySet());
+    }
+
+    private final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+        public Iterator<Map.Entry<K,V>> iterator() {
+            return newEntryIterator();
+        }
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry<K,V> e = (Map.Entry<K,V>) o;
+            Entry<K,V> candidate = getEntry(e.getKey());
+            return candidate != null && candidate.equals(e);
+        }
+        public boolean remove(Object o) {
+            return removeMapping(o) != null;
+        }
+        public int size() {
+            return size;
+        }
+        public void clear() {
+            HashMap.this.clear();
+        }
+    }
+
+可以看出最终遍历entrySet走的迭代器返回的是newEntryIterator，而newEntryIterator实现了HashIterator
+
+		
+	private abstract class HashIterator<E> implements Iterator<E> {
+        Entry<K,V> next;        // next entry to return
+        int expectedModCount;   // For fast-fail
+        int index;              // current slot
+        Entry<K,V> current;     // current entry
+
+        HashIterator() {
+            expectedModCount = modCount;
+            if (size > 0) { // advance to first entry
+                Entry[] t = table;
+				//所以最终取的还是table的内容
+                while (index < t.length && (next = t[index++]) == null)//这里表示找到第一个entry
+                    ;
+            }
+        }
+
+        public final boolean hasNext() {
+            return next != null;
+        }
+
+        final Entry<K,V> nextEntry() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+            Entry<K,V> e = next;
+            if (e == null)
+                throw new NoSuchElementException();
+
+            if ((next = e.next) == null) {
+                Entry[] t = table;
+                while (index < t.length && (next = t[index++]) == null)//如果为空继续寻找下一个槽
+                    ;
+            }
+            current = e;
+            return e;
+        }
+
+        public void remove() {
+            if (current == null)
+                throw new IllegalStateException();
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+            Object k = current.key;
+            current = null;
+            HashMap.this.removeEntryForKey(k);
+            expectedModCount = modCount;
+        }
+    }
+
+
+	
+	
+注：hashSet的本质就是对HashMap的处理，对于对象的序列化是由readObject(),writerObject()进行处理的	
+	
 
 
 [Mukosame]:    http://sun035.github.io  "Mukosame"

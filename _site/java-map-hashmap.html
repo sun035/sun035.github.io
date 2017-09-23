@@ -279,9 +279,13 @@ public class Test {
 
 <h2 id="hashmap学习">hashMap学习</h2>
 
+<p><img src="https://raw.githubusercontent.com/sun035/images/master/map%E7%B1%BB%E5%85%B3%E7%B3%BB%E5%9B%BE.png" alt="map类结构图" /></p>
+
 <p>1.7以前hashmap的结构是链表的数组的形式</p>
 
 <p>java8后对hashmap进行优化，主要为扩容后的处理链表大于8后将转化为红黑树</p>
+
+<p>这里只考虑实现方式，关于红黑树等数据结构将在以后进行学习</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>/**
  * The table, initialized on first use, and resized as
@@ -404,6 +408,100 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
 均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中rehash的时候，
 旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。</p>
 
+<h2 id="entryset实现">entrySet实现</h2>
+
+<p>在这之前说一下增强for循环，增强for循环的本质就是迭代器模式的实现，但我们不能再增强for循环中进行删除对象，在遍历的时候迭代器会创建一个原来对象数据的索引表
+这里删除对象中的元素索引表并不会改变 ，我们可以迭代器进行遍历使用它自身的remove，它在删除的时候也会维护索引</p>
+
+<p>jdk1.7实现</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() {
+    return entrySet0();
+}
+
+private Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet0() {
+    Set&lt;Map.Entry&lt;K,V&gt;&gt; es = entrySet;
+    return es != null ? es : (entrySet = new EntrySet());
+}
+
+private final class EntrySet extends AbstractSet&lt;Map.Entry&lt;K,V&gt;&gt; {
+    public Iterator&lt;Map.Entry&lt;K,V&gt;&gt; iterator() {
+        return newEntryIterator();
+    }
+    public boolean contains(Object o) {
+        if (!(o instanceof Map.Entry))
+            return false;
+        Map.Entry&lt;K,V&gt; e = (Map.Entry&lt;K,V&gt;) o;
+        Entry&lt;K,V&gt; candidate = getEntry(e.getKey());
+        return candidate != null &amp;&amp; candidate.equals(e);
+    }
+    public boolean remove(Object o) {
+        return removeMapping(o) != null;
+    }
+    public int size() {
+        return size;
+    }
+    public void clear() {
+        HashMap.this.clear();
+    }
+}
+</code></pre>
+</div>
+
+<p>可以看出最终遍历entrySet走的迭代器返回的是newEntryIterator，而newEntryIterator实现了HashIterator</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>private abstract class HashIterator&lt;E&gt; implements Iterator&lt;E&gt; {
+    Entry&lt;K,V&gt; next;        // next entry to return
+    int expectedModCount;   // For fast-fail
+    int index;              // current slot
+    Entry&lt;K,V&gt; current;     // current entry
+
+    HashIterator() {
+        expectedModCount = modCount;
+        if (size &gt; 0) { // advance to first entry
+            Entry[] t = table;
+			//所以最终取的还是table的内容
+            while (index &lt; t.length &amp;&amp; (next = t[index++]) == null)//这里表示找到第一个entry
+                ;
+        }
+    }
+
+    public final boolean hasNext() {
+        return next != null;
+    }
+
+    final Entry&lt;K,V&gt; nextEntry() {
+        if (modCount != expectedModCount)
+            throw new ConcurrentModificationException();
+        Entry&lt;K,V&gt; e = next;
+        if (e == null)
+            throw new NoSuchElementException();
+
+        if ((next = e.next) == null) {
+            Entry[] t = table;
+            while (index &lt; t.length &amp;&amp; (next = t[index++]) == null)//如果为空继续寻找下一个槽
+                ;
+        }
+        current = e;
+        return e;
+    }
+
+    public void remove() {
+        if (current == null)
+            throw new IllegalStateException();
+        if (modCount != expectedModCount)
+            throw new ConcurrentModificationException();
+        Object k = current.key;
+        current = null;
+        HashMap.this.removeEntryForKey(k);
+        expectedModCount = modCount;
+    }
+}
+</code></pre>
+</div>
+
+<p>注：hashSet的本质就是对HashMap的处理，对于对象的序列化是由readObject(),writerObject()进行处理的</p>
+
 
     </div>
 
@@ -443,6 +541,8 @@ static int indexFor(int h, int length) {  //jdk1.7的源码，jdk1.8没有这个
 
         <h2>Dump</h2>
         <ul class="artical-list">
+        
+            <li><a href="/structure-chain">单项链表学习</a></li>
         
             <li><a href="/arithmetic-start-two">算法 1.1.19题</a></li>
         

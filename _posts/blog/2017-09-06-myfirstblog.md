@@ -51,6 +51,12 @@ blog计划：
 		https://github.com/xwjie/PLMCodeTemplate
 		代码框架模板。追求工匠精神，编写简单代码。
 		
+		
+		1.链表--->linkedList/map
+		2.arrayList
+		
+		
+		
 		java ee基础  -->什么才是java的基础知识？
 		
 		spring 过滤器 拦截器 配置
