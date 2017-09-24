@@ -6,7 +6,7 @@
     * Revised:        Mukosame
     -->
     <meta charset="utf-8" />
-    <title>算法 1.1.14题 | wt'blog</title>
+    <title>对于递归的理解 | wt'blog</title>
     <meta name="author" content="Mukosame" />
     <meta name="renderer" content="webkit">
     <meta name="description" content="Everything about Mukosame" />
@@ -43,79 +43,46 @@
 
 <div id="content">
     <div class="entry">
-        <h1 class="entry-title"><a href="/arithmetic-start-one" title="算法 1.1.14题">算法 1.1.14题</a></h1>
-        <p class="entry-date">2017-09-16</p>
-        <p>开始填坑，强迫自己学习，不想只是一个码农…</p>
+        <h1 class="entry-title"><a href="/structure-recursion" title="对于递归的理解">对于递归的理解</a></h1>
+        <p class="entry-date">2017-09-24</p>
+        <h2 id="递归的理解">递归的理解</h2>
 
-<p>今天开始学习算法最终写下来使自己更加记忆深刻</p>
+<p>今天又学习了一下别人写的递归的博客，加深对递归的理解<a href="http://blog.csdn.net/javazejian/article/details/53452971">java数据结构与算法之递归思维(让我们更通俗地理解递归)</a></p>
 
-<h2 id="1114题">1.1.14题</h2>
+<p>原来对递归的理解就是自己本身调自己。。。但在在学习的时候发现递归是一种思想，或者思维方式，是将复杂的问题简单化，在依据简单问题推导复杂问题最终得出结论，递归就是程序设计的
+数学归纳法，所以我们用它并不是为了提高效率，而是为了简化问题，使问题更容易理解</p>
 
-<p>编写一个静态方法 lg()，接受一个整型参数 N，
-返回不大于 log2N 的最大整数。不要使用 Math 库。
-需要用到高中数学对数函数…这里先复习一下</p>
+<h2 id="递归算法">递归算法</h2>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>如果a的x次方为n,记作a^x=n;
+<p>递归算法的定义：任何调用自身函数的过程都可以称为递归算法。这里需要注意的是递归必须满足以下两个条件：</p>
 
-那么x就叫做，以a为底，n的对数
+<ol>
+  <li>
+    <p>子问题须与原始问题为同样的事，且更为简单；</p>
+  </li>
+  <li>
+    <p>不能无限制地调用本身，须有个出口，化简为非递归状况处理。</p>
+  </li>
+</ol>
 
-记作x=logan（这里a是下标）
+<p>例如：阶乘（1) = 1 [基本情况] 对所有n &gt; 1的整数：阶乘（n) = (n * 阶乘（n-1)) [递归定义] 一种便于理解的心理模型，是认为递归定义对对象的定义是按照“先前定义的”同类对象来定义的。例如：你怎样才能移动100个箱子？
+答案：你首先移动一个箱子，并记下它移动到的位置，然后再去解决较小的问题：你怎样才能移动99个箱子？最终，你的问题将变为怎样移动一个箱子，而这时你已经知道该怎么做的。</p>
 
-常用公式： logaa=1;
-		   loga1=0;
-		   lg100=以10为底即log10 100=2;//10的2次方等于100
-		   lg2*5=lg2+lg5=1;
+<h2 id="递归应用">递归应用</h2>
+
+<p>递归算法一般用于解决三类问题：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(1)数据的定义是按递归定义的。（Fibonacci函数）
+(2)问题解法按递归算法实现。
+这类问题虽则本身没有明显的递归结构，但用递归求解比迭代求解更简单，如Hanoi问题。
+(3)数据的结构形式是按递归定义的。
+如二叉树、广义表等，由于结构本身固有的递归特性，则它们的操作可递归地描述。
 </code></pre>
 </div>
 
-<h2 id="例题">例题</h2>
-<p><img src="https://raw.githubusercontent.com/sun035/images/master/%E5%AF%B9%E6%95%B0%E5%87%BD%E6%95%B0.png" alt="对数函数" /></p>
+<h2 id="递归的缺点">递归的缺点</h2>
 
-<h2 id="思路">思路</h2>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>根据上边复习的内容可知，返回不大于 log2N 的最大整数，
-n是已知的，x=log2n ，2的x次方等于n 得出下面程序
-</code></pre>
-</div>
-
-<h2 id="解答">解答</h2>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>private static int lg(int N) {  
-		int product = 1;  
-		int x = -1;  
-		while (product &lt;= N) //把等于的情况也纳入进来，从而避免了在如23&gt;5这种情况的自增导致输出结果为3的情况  
-		{  
-			product *= 2;  
-			x++;  
-		}  
-		return x;  
-	}  
-	  
-	public static void main(String args[]) {  
-		int N = 100;
-		System.out.print(lg(N));  
-	}
-</code></pre>
-</div>
-
-<h2 id="思考">思考</h2>
-<div class="highlighter-rouge"><pre class="highlight"><code>	哦天真是够水的 
-	
-	在写的过程中还是没有实现出来,大脑在写的时候总是没有思路而在看别人的答案
-    却一看就懂我觉得还是没有一个整体的概念，脑子里的东西太零碎无法整合出来，一方面
-    也是平常不善于总结也是不善于抽象化的思考将其转化为程序 
-
-	对此应该考虑一个方案,先找到一个条件作为自认为的中为入口，即像如上面的题一样，
-    2的x次方等于用户给定的值，可以直接得出结论吗？显然是不能的，则要进行假设，初始值
-    进行计算判断，当p=1时成立吗？p等于2时...,这个时候肯定是要对中间值进行存储,也要
-    对x进行计数...然后代入法测试是否成立...
-
-	好吧当然是知道答案的时候好像都明白，一本正经的胡说八道一同，但这也是对自己的
-    一个警示，也是为什么要动手写博客的一个原因
-
-	找方法解决如何独立思考....千万不要忘了 复盘！ 复盘！
-</code></pre>
-</div>
+<p>递归算法解题相对常用的算法如普通循环等，运行效率较低。因此，应该尽量避免使用递归，除非没有更好的算法或者某种特定情况，递归更为适合的时候。在递归调用的过程当中系统为每一层的返回点、局部量等开辟了栈来存储。递归次数过多容易造成栈溢出等。</p>
 
 
     </div>

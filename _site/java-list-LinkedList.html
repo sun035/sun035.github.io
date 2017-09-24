@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--
+    * Author:         BeiYuu
+    * Revised:        Mukosame
+    -->
+    <meta charset="utf-8" />
+    <title>linkedList学习 | wt'blog</title>
+    <meta name="author" content="Mukosame" />
+    <meta name="renderer" content="webkit">
+    <meta name="description" content="Everything about Mukosame" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/css/default.css" type="text/css" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="alternate" type="application/atom+xml" title="Recent Entries" href="/atom.xml" />
+    <script src="/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+</head>
+<body>
+
+    <div class="home-menu">
+        <div class="home-icon-con">
+            <a class="home-menu-icon" href="/">Mukosame</a>
+            <a class="home-follow" href="#" title="Contact Me">+</a>
+        </div>
+        <div class="home-contact">
+          
+            <a href="https://www.ibm.com/developerworks/cn/java/" target="_blank" style="text-align:center;"><img src="https://www.ibm.com/favicon.ico" alt="" width="22"/></a>
+            <a href="http://http://wiki.jikexueyuan.com/list/java/" target="_blank" style="text-align:right"><img src="http://wiki.jikexueyuan.com/assets/favicon.ico" alt="" width="22"/></a>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/js/prettify/prettify.css" />
+<style type="text/css">
+    body { background:#e8e8e8; }
+    @media screen and (max-width: 750px){
+        body { background:#fff; }
+    }
+    @media screen and (max-width: 1020px){
+        body { background:#fff; }
+    }
+</style>
+
+<div id="content">
+    <div class="entry">
+        <h1 class="entry-title"><a href="/java-list-LinkedList" title="linkedList学习">linkedList学习</a></h1>
+        <p class="entry-date">2017-09-24</p>
+        <h2 id="双端链表的结构图">双端链表的结构图</h2>
+
+<p><img src="https://raw.githubusercontent.com/sun035/images/master/%E5%8F%8C%E7%AB%AF%E9%93%BE%E8%A1%A8.png" alt="双端链表的结构图" /></p>
+
+<p>add方法</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public boolean add(E e) {
+		linkLast(e);
+		return true;
+	}
+</code></pre>
+</div>
+
+<p>其内部调用linkLast()</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>void linkLast(E e) {
+		final Node&lt;E&gt; l = last;
+		final Node&lt;E&gt; newNode = new Node&lt;&gt;(l, e, null);//创建一个新节点并将它的上一个指向last
+		last = newNode;//在将它本身作为最后一个
+		if (l == null)
+			first = newNode;
+		else
+			l.next = newNode;//将原本的最后节点的下一个节点改为新创建的
+		size++;
+		modCount++;
+	}
+
+  private static class Node&lt;E&gt; {
+		E item;
+		Node&lt;E&gt; next;
+		Node&lt;E&gt; prev;
+
+		Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) {
+			this.item = element;
+			this.next = next;
+			this.prev = prev;
+		}
+	}
+</code></pre>
+</div>
+
+<h2 id="add方法的结构">add方法的结构</h2>
+
+<p><img src="https://raw.githubusercontent.com/sun035/images/master/add.JPG" alt="" /></p>
+
+<h2 id="当添加第一个数据时结构为">当添加第一个数据时结构为</h2>
+
+<p><img src="https://raw.githubusercontent.com/sun035/images/master/%E5%A2%9E%E5%8A%A0%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%97%B6.png" alt="" /></p>
+
+<p>add重载方法</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> public void add(int index, E element) {
+    checkPositionIndex(index);//验证是否越界
+
+    if (index == size)//直接加载最后
+        linkLast(element);
+    else
+        linkBefore(element, node(index));//中间插入，先根据node（index）定位
+}
+
+
+ Node&lt;E&gt; node(int index) {
+		// assert isElementIndex(index);
+		//这里进行了优化判断下标在前半部还是后半部
+		if (index &lt; (size &gt;&gt; 1)) {
+			Node&lt;E&gt; x = first;
+			for (int i = 0; i &lt; index; i++)
+				x = x.next;
+			return x;
+		} else {
+			Node&lt;E&gt; x = last;
+			for (int i = size - 1; i &gt; index; i--)
+				x = x.prev;
+			return x;
+		}
+	}
+
+
+  void linkBefore(E e, Node&lt;E&gt; succ) {
+		// assert succ != null;
+		在制定的位置前进行插入
+		final Node&lt;E&gt; pred = succ.prev;//将当前的上一个暂存
+		final Node&lt;E&gt; newNode = new Node&lt;&gt;(pred, e, succ);//让新创建的节点插入到中间
+		succ.prev = newNode;//将原来的节点的上一个节点更改
+		if (pred == null)
+			first = newNode;
+		else
+			pred.next = newNode;//原节点的上一个节点的下一个节点进行更改
+		size++;
+		modCount++;
+	}
+</code></pre>
+</div>
+
+<p>其插入也比较好理解，可以根据上边图将第2认为是插入根据代码理解即可</p>
+
+<h2 id="删除方法">删除方法</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  public boolean remove(Object o) {
+		if (o == null) {
+			for (Node&lt;E&gt; x = first; x != null; x = x.next) {
+				if (x.item == null) {
+					unlink(x);
+					return true;
+				}
+			}
+		} else {
+			for (Node&lt;E&gt; x = first; x != null; x = x.next) {
+				if (o.equals(x.item)) {
+					unlink(x);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+</code></pre>
+</div>
+
+<p>对null进行特殊处理，遍历到内容后调用unlink方法进行删除</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> E unlink(Node&lt;E&gt; x) {
+		// assert x != null;
+		final E element = x.item;
+		final Node&lt;E&gt; next = x.next;
+		final Node&lt;E&gt; prev = x.prev;
+
+		if (prev == null) {//是否是头结点
+			first = next;
+		} else {
+			prev.next = next;//改变引用将原来的上一个节点指向他的下一个节点
+			x.prev = null;
+		}
+
+		if (next == null) {//同上
+			last = prev;
+		} else {
+			next.prev = prev;
+			x.next = null;
+		}
+
+		x.item = null;
+		size--;
+		modCount++;
+		return element;
+	}
+</code></pre>
+</div>
+
+<h2 id="iterator">iterator</h2>
+
+<p>对于linkedList本身就是对双向链表的增删改，源码中还实现了栈和队列的操作方法，因此也可以作为栈、队列和双端队列来使用。
+LinkedList 是一个继承于AbstractSequentialList的双向链表。它也可以被当作堆栈、队列或双端队列进行操作。
+实现 List 接口，能对它进行队列操作。实现 Deque 接口，即能将LinkedList当作双端队列使用。实现了Cloneable接口，
+即覆盖了函数clone()，能克隆。实现java.io.Serializable接口，这意味着LinkedList支持序列化，能通过序列化去传输。同时LinkedList 是非同步的</p>
+
+<p>在AbstractSequentialList中有一个抽样方法</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public abstract ListIterator&lt;E&gt; listIterator(int index);		
+</code></pre>
+</div>
+
+<p>其规定的增加删除等都是根据这个抽样方法来实现的，具体定义由实现类来定义，这里我们看一下LinkedList内部类的实现</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public ListIterator&lt;E&gt; listIterator(int index) {
+		checkPositionIndex(index);
+		return new ListItr(index);
+	}
+
+	private class ListItr implements ListIterator&lt;E&gt; {
+
+		
+		private Node&lt;E&gt; lastReturned = null;
+		private Node&lt;E&gt; next;
+		private int nextIndex;
+		private int expectedModCount = modCount;
+
+		ListItr(int index) {
+			// assert isPositionIndex(index);
+			next = (index == size) ? null : node(index);
+			nextIndex = index;
+		}
+
+		public boolean hasNext() {
+			return nextIndex &lt; size;
+		}
+
+		public E next() {
+			checkForComodification();
+			if (!hasNext())
+				throw new NoSuchElementException();
+
+			lastReturned = next;
+			next = next.next;
+			nextIndex++;
+			return lastReturned.item;
+		}
+
+		public boolean hasPrevious() {
+			return nextIndex &gt; 0;
+		}
+
+		public E previous() {
+			checkForComodification();
+			if (!hasPrevious())
+				throw new NoSuchElementException();
+
+			lastReturned = next = (next == null) ? last : next.prev;
+			nextIndex--;
+			return lastReturned.item;
+		}
+
+		public int nextIndex() {
+			return nextIndex;
+		}
+
+		public int previousIndex() {
+			return nextIndex - 1;
+		}
+
+		public void remove() {
+			checkForComodification();
+			if (lastReturned == null)
+				throw new IllegalStateException();
+
+			Node&lt;E&gt; lastNext = lastReturned.next;
+			unlink(lastReturned);
+			if (next == lastReturned)
+				next = lastNext;
+			else
+				nextIndex--;
+			lastReturned = null;
+			expectedModCount++;
+		}
+
+		public void set(E e) {
+			if (lastReturned == null)
+				throw new IllegalStateException();
+			checkForComodification();
+			lastReturned.item = e;
+		}
+
+		public void add(E e) {
+			checkForComodification();
+			lastReturned = null;
+			if (next == null)
+				linkLast(e);
+			else
+				linkBefore(e, next);
+			nextIndex++;
+			expectedModCount++;
+		}
+
+		final void checkForComodification() {
+			if (modCount != expectedModCount)
+				throw new ConcurrentModificationException();
+		}
+	}
+</code></pre>
+</div>
+
+
+    </div>
+
+    <div class="sidenav">
+        <h2>Blog</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/java-list-LinkedList">linkedList学习</a></li>
+        
+            <li><a href="/java-map-hashmap-%E5%89%AF%E6%9C%AC">hashMap学习</a></li>
+        
+            <li><a href="/javaee-start">什么才是java的基础知识？</a></li>
+        
+            <li><a href="/code-standard">代码规范学习</a></li>
+        
+            <li><a href="/java-spring-transaction">spring 事务</a></li>
+        
+            <li><a href="/linux-order">linux 命令</a></li>
+        
+            <li><a href="/mysql-indexes">mysql indexes</a></li>
+        
+            <li><a href="/java-aop-cglib">java 动态代理 cglib</a></li>
+        
+            <li><a href="/java-aop">java 动态代理 jdk</a></li>
+        
+            <li><a href="/java-final">java final</a></li>
+        
+            <li><a href="/java-spring-ioc">spring ioc 双向引用</a></li>
+        
+            <li><a href="/js-jquery">jquery 方法</a></li>
+        
+            <li><a href="/java-jndi">java jndi</a></li>
+        
+            <li><a href="/git-order">git常用命令</a></li>
+        
+            <li><a href="/myfirstblog">只言</a></li>
+        
+        </ul>
+
+        <h2>Dump</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/structure-recursion">对于递归的理解</a></li>
+        
+            <li><a href="/structure-chain">单项链表学习</a></li>
+        
+            <li><a href="/arithmetic-start-two">算法 1.1.19题</a></li>
+        
+            <li><a href="/arithmetic-start-one">算法 1.1.14题</a></li>
+        
+        </ul>
+
+        <h2>Project</h2>
+        <ul class="artical-list">
+        
+            <li><a href="/pro">匠心</a></li>
+        
+        </ul>
+    </div>
+</div>
+
+<script src="/js/post.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        $(function(){
+            $('.home-follow').click(function(e){
+                e.preventDefault();
+
+                if($('.home-contact').is(':visible')){
+                    $('.home-contact').slideUp(100);
+                }else{
+                    $('.home-contact').slideDown(100);
+                }
+            });
+        })
+    </script>
+</body>
+</html>
