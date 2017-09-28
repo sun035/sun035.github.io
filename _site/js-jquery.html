@@ -49,26 +49,26 @@
 
 <hr />
 
-<h2 id="一jquery的扩展方法原型是-extenddestsrc1src2src3">一、Jquery的扩展方法原型是: extend(dest,src1,src2,src3…);</h2>
+<h2 id="一jquery的扩展方法原型是-extenddestsrc1src2src3">一、Jquery的扩展方法原型是: extend(dest,src1,src2,src3);</h2>
 
-<p>就是将src1,src2,src3…合并到dest中 但是会修改dest的结构</p>
+<p>就是将src1,src2,src3合并到dest中 但是会修改dest的结构</p>
 
 <p>如果仅想合并其中的内容可以考虑：</p>
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
 <div class="language-javascript highlighter-rouge"><pre class="highlight"><code>
-<span class="kd">var</span> <span class="nx">newSrc</span><span class="o">=</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span><span class="nx">src1</span><span class="p">,</span><span class="nx">src2</span><span class="p">,</span><span class="nx">src3</span><span class="p">...)</span><span class="c1">//也就是将"{}"作为dest参数。</span>
+<span class="kd">var</span> <span class="nx">newSrc</span><span class="o">=</span><span class="nx">$extend</span><span class="p">({},</span><span class="nx">src1</span><span class="p">,</span><span class="nx">src2</span><span class="p">,</span><span class="nx">src3</span><span class="p">)</span><span class="c1">//也就是将"{}"作为dest参数。</span>
 
 </code></pre>
 </div>
 
-<p>#这样就可以将src1,src2,src3…进行合并，然后将合并结果返回给newSrc了。如下例：</p>
+<p>#这样就可以将src1,src2,src3进行合并，然后将合并结果返回给newSrc了。如下例：</p>
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
 <div class="language-javascript highlighter-rouge"><pre class="highlight"><code>
-<span class="kd">var</span> <span class="nx">result</span><span class="o">=</span><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},{</span><span class="na">name</span><span class="p">:</span><span class="s2">"Tom"</span><span class="p">,</span><span class="na">age</span><span class="p">:</span><span class="mi">21</span><span class="p">},{</span><span class="na">name</span><span class="p">:</span><span class="s2">"Jerry"</span><span class="p">,</span><span class="na">sex</span><span class="p">:</span><span class="s2">"Boy"</span><span class="p">})</span><span class="err"> </span>
+<span class="kd">var</span> <span class="nx">result</span><span class="o">=</span><span class="nx">$extend</span><span class="p">({},{</span><span class="na">name</span><span class="p">:</span><span class="s2">"Tom"</span><span class="p">,</span><span class="na">age</span><span class="p">:</span><span class="mi">21</span><span class="p">},{</span><span class="na">name</span><span class="p">:</span><span class="s2">"Jerry"</span><span class="p">,</span><span class="na">sex</span><span class="p">:</span><span class="s2">"Boy"</span><span class="p">})</span><span class="err"> </span>
 
 </code></pre>
 </div>
@@ -89,11 +89,11 @@
 
 <p>上述的extend方法原型中的dest参数是可以省略的，如果省略了，则该方法就只能有一个src参数，而且是将该src合并到调用extend方法的对象中去，如：</p>
 
-<p>1、$.extend(src)该方法就是将src合并到jquery的全局对象中去，如：</p>
+<p>1、$extend(src)该方法就是将src合并到jquery的全局对象中去，如：</p>
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$extend</span><span class="p">({</span>
 	<span class="na">hello</span><span class="p">:</span><span class="kd">function</span><span class="p">(){</span><span class="nx">alert</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">);}</span>
 <span class="p">});</span>
 
@@ -102,11 +102,11 @@
 
 <p>就是将hello方法合并到jquery的全局对象中。</p>
 
-<p>2、$.fn.extend(src)该方法将src合并到jquery的实例对象中去，如:</p>
+<p>2、$fnextend(src)该方法将src合并到jquery的实例对象中去，如:</p>
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$fnextend</span><span class="p">({</span>
 	<span class="na">hello</span><span class="p">:</span><span class="kd">function</span><span class="p">(){</span><span class="nx">alert</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">);</span><span class="c1">//就是将hello方法合并到jquery的实例对象中。}</span>
 <span class="p">});</span>
 
@@ -116,7 +116,7 @@
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span><span class="na">net</span><span class="p">:{}});</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$extend</span><span class="p">({</span><span class="na">net</span><span class="p">:{}});</span>
 
 </code></pre>
 </div>
@@ -125,7 +125,7 @@
 
 <p><code class="highlighter-rouge">javascript</code></p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">net</span><span class="p">,{</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="nx">$extend</span><span class="p">(</span><span class="nx">$net</span><span class="p">,{</span>
 	<span class="na">hello</span><span class="p">:</span><span class="kd">function</span><span class="p">(){</span><span class="nx">alert</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">);}</span>
 <span class="p">})</span>
 
@@ -145,13 +145,13 @@
 
 <span class="err">实例一：</span>
 
-<span class="nx">$</span><span class="p">(</span><span class="s2">"#btn1"</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> 
-<span class="err">     </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greeting"</span><span class="p">,</span> <span class="s2">"Hello World"</span><span class="p">);</span> <span class="c1">//  向被选元素附加数据</span>
+<span class="nx">$</span><span class="p">(</span><span class="s2">"#btn1"</span><span class="p">)</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> 
+<span class="err">     </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">)</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greeting"</span><span class="p">,</span> <span class="s2">"Hello World"</span><span class="p">);</span> <span class="c1">//  向被选元素附加数据</span>
 <span class="p">});</span>
 <span class="err"> </span>
 
-<span class="nx">$</span><span class="p">(</span><span class="s2">"#btn2"</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> 
-<span class="err">      </span><span class="nx">alert</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greeting"</span><span class="p">));</span><span class="c1">//获取数据,获取键为"greeting"的值，应该为Hello World</span>
+<span class="nx">$</span><span class="p">(</span><span class="s2">"#btn2"</span><span class="p">)</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> 
+<span class="err">      </span><span class="nx">alert</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">)</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greeting"</span><span class="p">));</span><span class="c1">//获取数据,获取键为"greeting"的值，应该为Hello World</span>
 <span class="p">});</span>
 
 
@@ -159,15 +159,15 @@
 <span class="err">实例二：</span>
 
 <span class="err"> </span> <span class="nx">testObj</span><span class="o">=</span><span class="k">new</span> <span class="nb">Object</span><span class="p">();</span>
-<span class="err"> </span> <span class="nx">testObj</span><span class="p">.</span><span class="nx">greetingMorn</span><span class="o">=</span><span class="s2">"Good Morning!"</span><span class="p">;</span>
-<span class="err"> </span> <span class="nx">testObj</span><span class="p">.</span><span class="nx">greetingEve</span><span class="o">=</span><span class="s2">"Good Evening!"</span><span class="p">;</span>
+<span class="err"> </span> <span class="nx">testObjgreetingMorn</span><span class="o">=</span><span class="s2">"Good Morning!"</span><span class="p">;</span>
+<span class="err"> </span> <span class="nx">testObjgreetingEve</span><span class="o">=</span><span class="s2">"Good Evening!"</span><span class="p">;</span>
 
-<span class="err"> </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#btn1"</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
-<span class="err">   </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="nx">testObj</span><span class="p">);</span>
+<span class="err"> </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#btn1"</span><span class="p">)</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+<span class="err">   </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">)</span><span class="nx">data</span><span class="p">(</span><span class="nx">testObj</span><span class="p">);</span>
 <span class="err"> </span> <span class="p">});</span>
 
-<span class="err"> </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#btn2"</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
-<span class="err">   </span> <span class="nx">alert</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greetingEve"</span><span class="p">));</span><span class="c1">// 输出"Good Evening!"</span>
+<span class="err"> </span> <span class="nx">$</span><span class="p">(</span><span class="s2">"#btn2"</span><span class="p">)</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+<span class="err">   </span> <span class="nx">alert</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">"div"</span><span class="p">)</span><span class="nx">data</span><span class="p">(</span><span class="s2">"greetingEve"</span><span class="p">));</span><span class="c1">// 输出"Good Evening!"</span>
 <span class="err"> </span> <span class="p">});</span>
 
 </code></pre>
@@ -178,51 +178,221 @@
 
 <h2 id="查找指定选择器下所有的inputselect-并遍历每一个">//查找指定选择器下所有的input，select 并遍历每一个</h2>
 
-<p>$(opts.form).find(“input,select”).each(function(){
-        		if($.trim($(this).val())!=””){
-					//$(this).attr(“name”),取name值
-        			opts.param[$(this).attr(“name”)]=$(this).val();
+<p>$(optsform)find(“input,select”)each(function(){
+        		if($trim($(this)val())!=””){
+					//$(this)attr(“name”),取name值
+        			optsparam[$(this)attr(“name”)]=$(this)val();
         		}
-				//$(this).val(); 获取val
-        		opts.param[$(this).attr(“name”)]=$(this).val();
+				//$(this)val(); 获取val
+        		optsparam[$(this)attr(“name”)]=$(this)val();
         	});</p>
 
 <h2 id="追加子节点">//追加子节点</h2>
-<p>$(“.class”).append(&lt;div&gt;&lt;div&gt;);</p>
+<p>$(“class”)append(&lt;div&gt;&lt;div&gt;);</p>
 
 <h2 id="规定当dom完全加载时页面要执行的函数">//规定当dom完全加载时（页面）要执行的函数</h2>
 
-<p>$(“.class”).ready(function(){…});</p>
+<p>$(“class”)ready(function(){});</p>
 
 <h2 id="回车键出发搜索按钮">//回车键出发搜索按钮</h2>
-<div class="highlighter-rouge"><pre class="highlight"><code>$("body").keydown(function(){
-	if(event.keyCode=="13"){
-		$(".query").click();
+<div class="highlighter-rouge"><pre class="highlight"><code>$("body")keydown(function(){
+	if(eventkeyCode=="13"){
+		$("query")click();
 	}
 	});
 </code></pre>
 </div>
 
 <h2 id="删除当前元素与其子元素">//删除当前元素与其子元素</h2>
-<p>$(“.class”).remove();</p>
+<p>$(“class”)remove();</p>
 
 <h2 id="删除子元素">//删除子元素</h2>
-<p>$(“.class”).empty();</p>
+<p>$(“class”)empty();</p>
 
 <h2 id="后绑定事件">//后绑定事件</h2>
 
-<p>$(“body”).on(“click”,”.newadd1”,function(){}</p>
+<p>$(“body”)on(“click”,”newadd1”,function(){}</p>
 
 <h2 id="将对象转为json字符串格式">//将对象转为json字符串格式</h2>
 
-<p>JSON.stringify({onceCode:single})</p>
+<p>JSONstringify({onceCode:single})</p>
 
 <h2 id="解析对象转为字符串格式">//解析对象转为字符串格式</h2>
-<p>var data=JSON.parse(mess);</p>
+<p>var data=JSONparse(mess);</p>
 
 <h2 id="全局变量中取值-对应的是setitem">//全局变量中取值 对应的是setItem</h2>
 
-<p>var single=localStorage.getItem(“single”);</p>
+<p>var single=localStoragegetItem(“single”);</p>
+
+<h2 id="jquery-ajax-方法">jQuery $ajax() 方法</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ajax({
+   type: "POST",
+   url: "somephp",
+   data: "name=John&amp;location=Boston",
+   success: function(msg){
+	 alert( "Data Saved: " + msg );
+   }
+});   
+</code></pre>
+</div>
+
+<h2 id="jquery-post-方法">jQuery $post() 方法</h2>
+
+<p>$post() 方法通过 HTTP POST 请求从服务器上请求数据。</p>
+
+<p>语法:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$post(URL,data,callback); 
+</code></pre>
+</div>
+
+<p>必需的 URL 参数规定您希望请求的 URL。
+可选的 data 参数规定连同请求发送的数据。
+可选的 callback 参数是请求成功后所执行的函数名。
+下面的例子使用 $post() 连同请求一起发送数据：</p>
+
+<p>实例</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$("button")click(function(){
+  $post("demo_test_posthtml",
+  {
+	name:"Donald Duck",
+	city:"Duckburg"
+  },
+  function(data,status){
+	alert("Data: " + data + "nStatus: " + status);
+  });
+});   
+</code></pre>
+</div>
+
+<h2 id="选择器">选择器</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>*	$("*")	所有元素
+
+#id	$("#lastname")	id="lastname" 的元素
+
+.class	$(".intro")	class="intro" 的所有元素
+
+.class,.class	$(".intro,.demo")	class 为 "intro" 或 "demo" 的所有元素
+
+element	$("p")	所有 &lt;p&gt; 元素
+
+el1,el2,el3	$("h1,div,p")	所有 &lt;h1&gt;、&lt;div&gt; 和 &lt;p&gt; 元素
+		 
+:first	$("p:first")	第一个 &lt;p&gt; 元素
+
+:last	$("p:last")	最后一个 &lt;p&gt; 元素
+
+:even	$("tr:even")	所有偶数 &lt;tr&gt; 元素
+
+:odd	$("tr:odd")	所有奇数 &lt;tr&gt; 元素
+		 
+:first-child	$("p:first-child")	属于其父元素的第一个子元素的所有 &lt;p&gt; 元素
+
+:first-of-type	$("p:first-of-type")	属于其父元素的第一个 &lt;p&gt; 元素的所有 &lt;p&gt; 元素
+
+:last-child	$("p:last-child")	属于其父元素的最后一个子元素的所有 &lt;p&gt; 元素
+
+:last-of-type	$("p:last-of-type")	属于其父元素的最后一个 &lt;p&gt; 元素的所有 &lt;p&gt; 元素
+
+:nth-child(n)	$("p:nth-child(2)")	属于其父元素的第二个子元素的所有 &lt;p&gt; 元素
+
+:nth-last-child(n)	$("p:nth-last-child(2)")	属于其父元素的第二个子元素的所有 &lt;p&gt; 元素，
+从最后一个子元素开始计数
+
+:nth-of-type(n)	$("p:nth-of-type(2)")	属于其父元素的第二个 &lt;p&gt; 元素的所有 &lt;p&gt; 元素
+
+:nth-last-of-type(n)	$("p:nth-last-of-type(2)")	属于其父元素的第二个 
+&lt;p&gt; 元素的所有 &lt;p&gt; 元素，从最后一个子元素开始计数
+
+:only-child	$("p:only-child")	属于其父元素的唯一子元素的所有 &lt;p&gt; 元素
+
+:only-of-type	$("p:only-of-type")	属于其父元素的特定类型的唯一子元素的所有 &lt;p&gt; 元素
+		 
+parent &gt; child	$("div &gt; p")	&lt;div&gt; 元素的直接子元素的所有 &lt;p&gt; 元素
+
+parent descendant	$("div p")	&lt;div&gt; 元素的后代的所有 &lt;p&gt; 元素
+
+element + next	$("div + p")	每个 &lt;div&gt; 元素相邻的下一个 &lt;p&gt; 元素
+
+element ~ siblings	$("div ~ p")	&lt;div&gt; 元素同级的所有 &lt;p&gt; 元素
+		 
+:eq(index)	$("ul li:eq(3)")	列表中的第四个元素（index 值从 0 开始）
+
+:gt(no)	$("ul li:gt(3)")	列举 index 大于 3 的元素
+
+:lt(no)	$("ul li:lt(3)")	列举 index 小于 3 的元素
+
+:not(selector)	$("input:not(:empty)")	所有不为空的输入元素
+		 
+:header	$(":header")	所有标题元素 &lt;h1&gt;, &lt;h2&gt; ...
+
+:animated	$(":animated")	所有动画元素
+
+:focus	$(":focus")	当前具有焦点的元素
+
+:contains(text)	$(":contains('Hello')")	所有包含文本 "Hello" 的元素
+
+:has(selector)	$("div:has(p)")	所有包含有 &lt;p&gt; 元素在其内的 &lt;div&gt; 元素
+
+:empty	$(":empty")	所有空元素
+
+:parent	$(":parent")	选择所有含有子元素或者文本的父级元素。
+
+:hidden	$("p:hidden")	所有隐藏的 &lt;p&gt; 元素
+
+:visible	$("table:visible")	所有可见的表格
+
+:root	$(":root")	文档的根元素
+
+:lang(language)	$("p:lang(de)")	所有带有以 "de" 开头的 lang 属性值的 &lt;p&gt; 元素
+		 
+[attribute]	$("[href]")	所有带有 href 属性的元素
+
+[attribute=value]	$("[href='default.htm']")	所有带有 href 属性且值等于 "default.htm" 的元素
+
+[attribute!=value]	$("[href!='default.htm']")	所有带有 href 属性且值不等于 "default.htm" 的元素
+
+[attribute$=value]	$("[href$='.jpg']")	所有带有 href 属性且值以 ".jpg" 结尾的元素
+
+[attribute|=value]	$("[title|='Tomorrow']")	所有带有 title 属性
+且值等于 'Tomorrow' 或者以 'Tomorrow' 后跟连接符作为开头的字符串
+
+[attribute^=value]	$("[title^='Tom']")	所有带有 title 属性且值以 "Tom" 开头的元素
+
+[attribute~=value]	$("[title~='hello']")	所有带有 title 属性且值包含单词 "hello" 的元素
+
+[attribute*=value]	$("[title*='hello']")	所有带有 title 属性且值包含字符串 "hello" 的元素
+		 
+:input	$(":input")	所有 input 元素
+
+:text	$(":text")	所有带有 type="text" 的 input 元素
+
+:password	$(":password")	所有带有 type="password" 的 input 元素	 
+
+:checkbox	$(":checkbox")	所有带有 type="checkbox" 的 input 元素
+
+:submit	$(":submit")	所有带有 type="submit" 的 input 元素
+
+:reset	$(":reset")	所有带有 type="reset" 的 input 元素
+
+:button	$(":button")	所有带有 type="button" 的 input 元素
+
+:image	$(":image")	所有带有 type="image" 的 input 元素
+
+:file	$(":file")	所有带有 type="file" 的 input 元素
+
+:enabled	$(":enabled")	所有启用的 input 元素
+
+:disabled	$(":disabled")	所有禁用的 input 元素
+
+:selected	$(":selected")	所有选定的 input 元素	 	 
+
+:checked	$(":checked")	所有选中的 input 元素
+</code></pre>
+</div>
 
 
     </div>
@@ -231,7 +401,7 @@
         <h2>Blog</h2>
         <ul class="artical-list">
         
-            <li><a href="/project">乱七八糟</a></li>
+            <li><a href="/project-00">乱七八糟</a></li>
         
             <li><a href="/java-list-LinkedList">linkedList学习</a></li>
         
