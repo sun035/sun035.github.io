@@ -6,7 +6,7 @@
     * Revised:        Mukosame
     -->
     <meta charset="utf-8" />
-    <title>spring ioc 双向引用 | wt'blog</title>
+    <title>arrayList学习 | wt'blog</title>
     <meta name="author" content="Mukosame" />
     <meta name="renderer" content="webkit">
     <meta name="description" content="Everything about Mukosame" />
@@ -43,57 +43,72 @@
 
 <div id="content">
     <div class="entry">
-        <h1 class="entry-title"><a href="/java-spring-ioc" title="spring ioc 双向引用">spring ioc 双向引用</a></h1>
-        <p class="entry-date">2017-09-11</p>
-        <p>public abstract class AbstractBeanFactory implements BeanFactory {</p>
+        <h1 class="entry-title"><a href="/java-list-arrayList" title="arrayList学习">arrayList学习</a></h1>
+        <p class="entry-date">2017-10-11</p>
+        <h2 id="arraylist简介">arrayList简介</h2>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>@Override
-public Object getBean(String name) throws Exception {
-	BeanDefinition beanDefinition = beanDefinitionMap.get(name);
-	if (beanDefinition == null) {
-		throw new IllegalArgumentException("No bean named " + name + " is defined");
+<p>arrayList基于数组实现，优点在于其查询搜索快，但由于其增长是通过扩容机制，当容量不够时会创新一个新的数组并将数据进行复制
+所以当我们要存储的数据量比较大时最好给定数组长度，进行删除的时候也需要对数据进行移动，删除和增加会对性能有直接影响
+只看几个比较重要的方法</p>
+
+<h2 id="add方法">add方法</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> public boolean add(E e) {
+		ensureCapacityInternal(size + 1);  // Increments modCount!!
+		elementData[size++] = e;
+		return true;
 	}
-	Object bean = beanDefinition.getBean();
-	if (bean == null) {
-		bean = doCreateBean(beanDefinition);
-	}
-	return bean;
-}
-}
-</code></pre>
-</div>
 
-<p>public class AutowireCapableBeanFactory extends AbstractBeanFactory {</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>@Override
-protected Object doCreateBean(BeanDefinition beanDefinition) throws Exception {
-	Object bean = createBeanInstance(beanDefinition);
-    beanDefinition.setBean(bean);
-	applyPropertyValues(bean, beanDefinition);
-	return bean;
-}
-
-protected Object createBeanInstance(BeanDefinition beanDefinition) throws Exception {
-	return beanDefinition.getBeanClass().newInstance();
-}
-
-protected void applyPropertyValues(Object bean, BeanDefinition mbd) throws Exception {
-	for (PropertyValue propertyValue : mbd.getPropertyValues().getPropertyValues()) {
-		Field declaredField = bean.getClass().getDeclaredField(propertyValue.getName());
-		declaredField.setAccessible(true);
-		Object value = propertyValue.getValue();
-		if (value instanceof BeanReference) {
-			BeanReference beanReference = (BeanReference) value;
-			value = getBean(beanReference.getName());
+  private void ensureCapacityInternal(int minCapacity) {
+		if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {//判断是否为空 为空默认是10
+			minCapacity = Math.max(DEFAULT_CAPACITY, minCapacity);
 		}
-		declaredField.set(bean, value);
+
+		ensureExplicitCapacity(minCapacity);
 	}
-} }
+
+	private void ensureExplicitCapacity(int minCapacity) {
+		modCount++;//fastfall机制
+
+		// overflow-conscious code
+		if (minCapacity - elementData.length &gt; 0)
+			grow(minCapacity);//主要是这里
+	}
+
+private void grow(int minCapacity) {
+		// overflow-conscious code
+		int oldCapacity = elementData.length; // 目前数组大小
+		// 新容量为oldCapacity加上oldCapacity除以2（即&gt;&gt;右移位运算），这个是自动扩展数组大小的算法
+		// 当newCapacity大于minCapacity时并且没有到达数组最大值，都会将数组扩展为newCapacity大小
+		int newCapacity = oldCapacity + (oldCapacity &gt;&gt; 1);
+		if (newCapacity - minCapacity &lt; 0)
+			newCapacity = minCapacity; // 如果newCapacity小于指定的minCapacity，newCapacity取minCapacity
+		if (newCapacity - MAX_ARRAY_SIZE &gt; 0)
+			newCapacity = hugeCapacity(minCapacity);
+		// minCapacity is usually close to size, so this is a win:
+		elementData = Arrays.copyOf(elementData, newCapacity);//存到新的数组中
+	}
 </code></pre>
 </div>
 
-<p>为了解决循环依赖的问题，我们使用lazy-init的方式，将createBean的事情放到<code class="highlighter-rouge">getBean</code>的时候才执行，这样在注入bean的时候，
-如果该属性对应的bean找不到，那么就先创建！因为总是先创建后注入，所以不会存在两个循环依赖的bean创建死锁的问题。</p>
+<h2 id="remove方法">remove方法</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> public E remove(int index) {
+		rangeCheck(index);
+
+		modCount++;
+		E oldValue = elementData(index);
+
+		int numMoved = size - index - 1;
+		if (numMoved &gt; 0)
+			System.arraycopy(elementData, index+1, elementData, index,
+							 numMoved); // 将从index+1开始的元素向前移动一个位置
+		elementData[--size] = null; // clear to let GC do its work
+
+		return oldValue;
+	}
+</code></pre>
+</div>
 
 
     </div>
